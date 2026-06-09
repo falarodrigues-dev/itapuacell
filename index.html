@@ -1,0 +1,377 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:1rem 0 2rem}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary)}
+.lc{width:9px;height:9px;border-radius:50%}
+.lc-edu{background:#7F77DD}
+.lc-bastidor{background:#1D9E75}
+.lc-auto{background:#EF9F27}
+.lc-conv{background:#D85A30}
+.lc-star{background:#D4537E}
+
+.flow-summary{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1rem 1.25rem;margin-bottom:1.5rem}
+.fs-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.fs-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.fs-node{padding:4px 10px;border-radius:20px;font-size:11px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-secondary)}
+.fs-arr{color:var(--color-text-tertiary);font-size:11px}
+
+.timeline{position:relative;padding-left:28px}
+.tl-line{position:absolute;left:10px;top:0;bottom:0;width:1.5px;background:var(--color-border-tertiary)}
+
+.day-row{position:relative;margin-bottom:8px}
+.day-dot{position:absolute;left:-22px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;border:1.5px solid var(--color-background-primary);z-index:2}
+
+.day-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:10px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s}
+.day-card:hover{border-color:var(--color-border-primary)}
+.day-card.active{border-color:var(--color-border-primary);background:var(--color-background-secondary)}
+.day-card.star-card{border-color:#ED93B1}
+.day-card.star-card:hover{border-color:#D4537E}
+.day-card.star-card.active{border-color:#D4537E;background:#FBEAF0}
+
+.dc-left{flex-shrink:0;width:36px;text-align:center}
+.dc-day{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em}
+.dc-date{font-size:18px;font-weight:500;color:var(--color-text-secondary);line-height:1}
+
+.dc-right{flex:1;min-width:0}
+.dc-tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:20px;margin-bottom:4px}
+.dc-title{font-size:13px;font-weight:500;color:var(--color-text-primary);line-height:1.3;margin-bottom:2px}
+.dc-hook{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+.dc-conn{display:flex;align-items:center;gap:4px;margin-top:5px;flex-wrap:wrap}
+.conn-pill{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.star-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:#FBEAF0;color:#72243E;border:0.5px solid #ED93B1;display:inline-flex;align-items:center;gap:3px;margin-left:4px}
+
+.detail-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.1rem 1.25rem;margin:4px 0 8px;display:none}
+.detail-box.show{display:block}
+.dl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;margin-top:10px}
+.dl:first-child{margin-top:0}
+.dv{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.dv-script{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;font-size:11px;line-height:1.7;color:var(--color-text-primary);white-space:pre-wrap}
+.db-close{float:right;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:3px 8px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;margin-top:-2px}
+
+.week-sep{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin:1.4rem 0 .7rem;display:flex;align-items:center;gap:8px}
+.week-sep::after{content:'';flex:1;height:.5px;background:var(--color-border-tertiary)}
+.week-theme{display:inline-block;font-size:10px;font-weight:400;color:var(--color-text-tertiary);margin-left:4px;text-transform:none;letter-spacing:0}
+
+.tag-edu{background:#EEEDFE;color:#3C3489}
+.tag-bastidor{background:#E1F5EE;color:#085041}
+.tag-auto{background:#FAEEDA;color:#633806}
+.tag-conv{background:#FAECE7;color:#712B13}
+.tag-star{background:#FBEAF0;color:#72243E}
+
+.dot-edu{background:#7F77DD}
+.dot-bastidor{background:#1D9E75}
+.dot-auto{background:#EF9F27}
+.dot-conv{background:#D85A30}
+.dot-star{background:#D4537E}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Fluxo de posts para junho 2026 com foco em troca de carcaça de notebook</h2>
+
+<div class="flow-summary">
+  <div class="fs-title">Junho 2026 — dias 9 a 30, exceto domingos · 18 posts</div>
+  <div class="fs-row">
+    <span class="fs-node" style="border-color:#AFA9EC;color:#3C3489">Educação</span>
+    <span class="fs-arr">→</span>
+    <span class="fs-node" style="border-color:#5DCAA5;color:#085041">Bastidor / prova</span>
+    <span class="fs-arr">→</span>
+    <span class="fs-node" style="border-color:#EF9F27;color:#633806">Autoridade</span>
+    <span class="fs-arr">→</span>
+    <span class="fs-node" style="border-color:#D85A30;color:#712B13">Conversão</span>
+    <span class="fs-arr">→</span>
+    <span class="fs-node" style="border-color:#ED93B1;color:#72243E"><i class="ti ti-star" style="font-size:10px" aria-hidden="true"></i> Carcaça destaque</span>
+  </div>
+</div>
+
+<div class="legend">
+  <span class="leg"><span class="lc lc-edu"></span>Educativo</span>
+  <span class="leg"><span class="lc lc-bastidor"></span>Bastidor / prova</span>
+  <span class="leg"><span class="lc lc-auto"></span>Autoridade</span>
+  <span class="leg"><span class="lc lc-conv"></span>Conversão</span>
+  <span class="leg"><span class="lc lc-star"></span>Carcaça — destaque</span>
+  <span class="leg" style="margin-left:8px;color:var(--color-text-tertiary);font-size:11px"><i class="ti ti-click" style="font-size:13px"></i> Clique para ver detalhes</span>
+</div>
+
+<div class="timeline">
+  <div class="tl-line"></div>
+  <div id="feed"></div>
+</div>
+</div>
+
+<script>
+const posts = [
+  {grp:'Semana 1 (9–14/jun)',theme:'Apresentação e primeiro impacto',
+   day:'Ter',date:'9 jun',cat:'bastidor',tipo:'Reels',star:false,
+   title:'Bastidores da assistência — quem somos',
+   hook:'Abre o ciclo mostrando bancada, ferramentas e equipe. Primeira impressão forte.',
+   obj:'Apresentar a marca de forma humana antes de qualquer texto ou argumento de venda.',
+   conecta:'Define o tom visual do perfil. Quem vê esse Reels entende o ambiente antes de ler qualquer post.',
+   script:'Cena 1 — bancada com equipamentos organizados:\n"Por trás de cada conserto existe análise, cuidado e técnica."\n\nCena 2 — técnico avaliando notebook:\n"Aqui cada equipamento passa por uma verificação completa."\n\nCena 3 — equipamento funcionando:\n"Diagnóstico correto. Serviço bem feito. Cliente satisfeito."',
+   legenda:'Mais do que consertar equipamentos, nosso trabalho é identificar o problema com precisão e entregar uma solução segura. Computadores, notebooks e celulares.',
+   prox:'Post dos serviços (Qua 10)'},
+
+  {grp:null,
+   day:'Qua',date:'10 jun',cat:'edu',tipo:'Post estático',star:false,
+   title:'O que fazemos aqui — serviços da assistência',
+   hook:'Arte institucional clara com os 3 serviços. Fixa o portfólio na cabeça do seguidor novo.',
+   obj:'Deixar claro o que a assistência resolve logo no início do mês.',
+   conecta:'Quem viu o Reels de terça já conhece o ambiente — agora entende exatamente o que pode trazer.',
+   script:'Arte limpa:\n\nAssistência técnica especializada em:\n→ Computador\n→ Notebook\n→ Celular\n\nDiagnóstico técnico · Manutenção segura · Atendimento transparente\n\n[Endereço ou "Chama no WhatsApp"]',
+   legenda:'Seu equipamento apresentou problema? Aqui realizamos diagnóstico, manutenção e reparos com atenção, cuidado e transparência.',
+   prox:'Sinais de problema no notebook (Qui 11)'},
+
+  {grp:null,
+   day:'Qui',date:'11 jun',cat:'edu',tipo:'Carrossel',star:false,
+   title:'Sinais de que seu notebook precisa de manutenção',
+   hook:'Lista de alertas que o público já vive mas não sabe nomear. Gera salvamentos e identificação.',
+   obj:'Alcance orgânico. Pessoas que se identificam salvam e marcam amigos.',
+   conecta:'Planta a dor que o Reels de sexta resolve na prática.',
+   script:'Slide 1: "Seu notebook está dando sinais?"\nSlide 2: Esquentando muito\nSlide 3: Desligando sozinho\nSlide 4: Travando com frequência\nSlide 5: Fazendo barulho estranho\nSlide 6: Bateria descarrega rápido\nSlide 7: Tela piscando ou falhando\nSlide 8: Carcaça trincada ou com folga\nSlide final: "Qualquer um desses sinais? É hora de avaliar."',
+   legenda:'Nem sempre o problema começa de forma grave. Muitas vezes o notebook dá sinais antes de parar de vez. Um deles é até a carcaça — que pode comprometer as peças internas se ignorada.',
+   prox:'Limpeza interna na prática (Sex 12)'},
+
+  {grp:null,
+   day:'Sex',date:'12 jun',cat:'bastidor',tipo:'Reels',star:false,
+   title:'Limpeza interna de notebook — antes e depois',
+   hook:'Poeira acumulada visível. Resolve a dor listada no carrossel de quinta.',
+   obj:'Provar com imagem que o serviço é real e feito com cuidado técnico.',
+   conecta:'O carrossel citou superaquecimento e barulho — este Reels mostra a causa exata e a solução.',
+   script:'Cena 1 — notebook aberto com poeira interna:\n"Você sabia que isso pode causar superaquecimento?"\n\nCena 2 — limpeza feita com cuidado:\n"A limpeza interna melhora o desempenho e evita danos."\n\nCena 3 — notebook funcionando:\n"Manutenção preventiva também é economia."',
+   legenda:'A poeira acumulada dentro do notebook prejudica a ventilação, causa aquecimento excessivo e compromete peças importantes. A manutenção preventiva aumenta a vida útil do equipamento.',
+   prox:'Por que o computador fica lento (Sab 13)'},
+
+  {grp:null,
+   day:'Sab',date:'13 jun',cat:'edu',tipo:'Post estático',star:false,
+   title:'Por que o computador fica lento com o tempo?',
+   hook:'Dúvida universal. Alta probabilidade de compartilhamento e salvamento.',
+   obj:'Alcance orgânico. Fecha a primeira semana com conteúdo educativo leve e útil.',
+   conecta:'Educa sem vender. Cria autoridade e prepara o público para confiar na semana seguinte.',
+   script:'Arte com 4 motivos:\n→ Arquivos desnecessários acumulados\n→ Programas iniciando com o sistema\n→ Pouca memória RAM disponível\n→ HD/SSD com problema ou cheio\n\n"Identificou algum? Pode ter solução sem trocar nada."',
+   legenda:'O computador vai ficando lento com o uso natural. Na maioria dos casos tem solução sem precisar trocar o equipamento.',
+   prox:'Semana 2 abre com carcaça (Seg 15)'},
+
+  {grp:'Semana 2 (15–21/jun)',theme:'Carcaça em destaque + celular',
+   day:'Seg',date:'15 jun',cat:'star',tipo:'Post estático',star:true,
+   title:'Notebook com carcaça quebrada? Tem solução',
+   hook:'Abre a semana com o serviço destaque. Maioria das pessoas não sabe que existe troca de carcaça.',
+   obj:'Apresentar o serviço de troca de carcaça para quem nunca ouviu falar.',
+   conecta:'O carrossel de quinta passada já listou carcaça trincada como sinal de problema — agora mostra a solução.',
+   script:'Arte:\n\n"Seu notebook com carcaça:\n→ Quebrada\n→ Trincada\n→ Com folga\n→ Tampa solta\n→ Dobradiça arranhando\n\nNão precisa comprar um novo.\nTroca de carcaça resolve."',
+   legenda:'Muita gente não sabe, mas a carcaça do notebook pode ser trocada. O equipamento fica como novo por fora e continua com todas as configurações que você já tem.',
+   prox:'Troca de carcaça na prática — Reels (Ter 16)'},
+
+  {grp:null,
+   day:'Ter',date:'16 jun',cat:'star',tipo:'Reels',star:true,
+   title:'Troca de carcaça de notebook — processo completo',
+   hook:'Mostra desmontagem, instalação da carcaça nova e resultado final. Serviço que surpreende.',
+   obj:'Provar visualmente que o serviço existe, é feito com qualidade e o resultado é impressionante.',
+   conecta:'Post de segunda apresentou o conceito — este Reels prova com imagem real.',
+   script:'Cena 1 — notebook com carcaça danificada:\n"Carcaça quebrada, trincada ou com dobradiça solta?"\n\nCena 2 — desmontagem cuidadosa:\n"Cada peça removida com o cuidado que o equipamento merece."\n\nCena 3 — instalação da carcaça nova:\n"Peça nova, encaixe preciso."\n\nCena 4 — notebook montado com carcaça nova:\n"Mesmo notebook. Aparência de novo."\n\nTexto final: "Chama a gente. Fazemos avaliação."',
+   legenda:'Troca de carcaça é um dos serviços que mais surpreende quem nunca viu. O notebook fica com aparência de novo, mantendo tudo que você tinha — arquivos, sistema, configurações.',
+   prox:'Vale a pena trocar a carcaça? (Qua 17)'},
+
+  {grp:null,
+   day:'Qua',date:'17 jun',cat:'star',tipo:'Carrossel',star:true,
+   title:'Vale a pena trocar a carcaça do notebook?',
+   hook:'Pergunta direta com critérios claros. Resolve a objeção do custo antes de ela aparecer.',
+   obj:'Converter quem se interessou nos dois posts anteriores mas ainda tem dúvida se vale.',
+   conecta:'Fecha o trio de carcaça (post → Reels → argumento). Três dias consecutivos no mesmo tema criam autoridade.',
+   script:'Slide 1: "Vale a pena trocar a carcaça?"\nSlide 2: Sim se — o notebook funciona bem internamente\nSlide 3: Sim se — a carcaça está comprometendo o uso (dobradiça, folga, tela)\nSlide 4: Sim se — o custo da carcaça é menor que 30% do valor do aparelho\nSlide 5: Sim se — você quer evitar comprar um notebook novo\nSlide 6: Talvez não se — o equipamento já tem outros problemas sérios\nSlide final: "Na dúvida, peça uma avaliação. A gente te diz com honestidade."',
+   legenda:'A troca de carcaça costuma sair muito mais barata do que um notebook novo — e o resultado visual é o mesmo. Vale a pena avaliar antes de decidir pela troca do equipamento.',
+   prox:'Antes de trocar o celular, avalie (Qui 18)'},
+
+  {grp:null,
+   day:'Qui',date:'18 jun',cat:'edu',tipo:'Post estático',star:false,
+   title:'Antes de trocar o celular, faça uma avaliação técnica',
+   hook:'Muda o tema para celular após os 3 dias de carcaça. Mantém variedade no feed.',
+   obj:'Alcançar o público com problema de celular que ainda não apareceu.',
+   conecta:'Carcaça recebeu 3 dias de destaque. A transição para celular mantém o ritmo sem deixar o feed repetitivo.',
+   script:'Arte:\n"Seu celular parou de carregar?\nNem sempre é hora de trocar."\n\nProblemas com solução:\n→ Falha no carregamento\n→ Bateria descarregando rápido\n→ Tela com defeito\n→ Aparelho travando\n→ Botões sem resposta',
+   legenda:'Antes de trocar de celular, faça uma avaliação técnica e veja se o reparo vale a pena. Muitas vezes a solução é simples e o aparelho volta a funcionar normalmente.',
+   prox:'Troca de tela de celular na prática (Sex 19)'},
+
+  {grp:null,
+   day:'Sex',date:'19 jun',cat:'bastidor',tipo:'Reels',star:false,
+   title:'Troca de tela de celular — do início ao teste final',
+   hook:'Processo completo com teste de toque no final. Sequência técnica que gera credibilidade.',
+   obj:'Provar competência técnica em celular com imagem real.',
+   conecta:'Post de quinta plantou a ideia de que o reparo vale — este Reels prova com o serviço em execução.',
+   script:'Cena 1 — celular com tela danificada:\n"Tela quebrada?"\n\nCena 2 — processo técnico:\n"Reparo feito com cuidado e precisão."\n\nCena 3 — teste final:\n"Antes de entregar, tudo é testado."',
+   legenda:'Todo reparo precisa ser feito com atenção aos detalhes. Após o serviço, realizamos testes para verificar funcionamento, toque, imagem e resposta do aparelho.',
+   prox:'Mitos sobre assistência técnica (Sab 20)'},
+
+  {grp:null,
+   day:'Sab',date:'20 jun',cat:'auto',tipo:'Post estático',star:false,
+   title:'Mitos sobre assistência técnica',
+   hook:'"Verdade ou mito?" gera engajamento natural. Pessoas adoram descobrir que estavam erradas.',
+   obj:'Autoridade + engajamento. Fecha a semana 2 com post forte que gera salvamentos e comentários.',
+   conecta:'Após semana densa com bastidores e provas práticas, este post de autoridade encerra com leveza e conhecimento.',
+   script:'"Mito ou verdade?\n\n✗ Só assistência autorizada conserta bem\n→ Técnicos independentes bem treinados fazem o mesmo serviço.\n\n✗ Carcaça quebrada significa que o notebook está perdido\n→ A carcaça é só a proteção — o interior pode estar perfeito.\n\n✗ Se entrou água, coloca no arroz\n→ O arroz não absorve a umidade que já está dentro das peças."',
+   legenda:'Muito do que se ouve sobre manutenção técnica não é bem assim. Conhecimento correto faz diferença na hora de tomar a decisão certa para o seu equipamento.',
+   prox:'Semana 3: notebook e autoridade (Seg 22)'},
+
+  {grp:'Semana 3 (22–28/jun)',theme:'Autoridade e conversão',
+   day:'Seg',date:'22 jun',cat:'edu',tipo:'Carrossel',star:false,
+   title:'Cuidados que aumentam a vida útil do notebook',
+   hook:'Dicas práticas do dia a dia. Alta chance de salvar. Tom preventivo que mostra cuidado com o cliente.',
+   obj:'Gerar salvamentos e reforçar autoridade com conteúdo preventivo.',
+   conecta:'Semana 3 abre educando sobre prevenção. Mostra que a assistência orienta, não só conserta.',
+   script:'Slide 1: "Esses cuidados aumentam muito a vida do seu notebook."\nSlide 2: Nunca use em superfícies que tapam a ventilação (cama, travesseiro)\nSlide 3: Carregue com o carregador original ou certificado\nSlide 4: Faça limpeza interna a cada 6-12 meses\nSlide 5: Evite quedas — a carcaça protege, mas tem limite\nSlide 6: Não ignore barulhos estranhos ou aquecimento excessivo\nSlide final: "Já faz tempo que não faz manutenção? Chama a gente."',
+   legenda:'Pequenos cuidados no dia a dia evitam grandes problemas. E quando a manutenção preventiva é feita em dia, o notebook dura muito mais.',
+   prox:'O barato pode sair caro (Ter 23)'},
+
+  {grp:null,
+   day:'Ter',date:'23 jun',cat:'auto',tipo:'Post estático',star:false,
+   title:'O barato pode sair caro em manutenção',
+   hook:'Alerta que ressoa porque quase todo mundo já passou por isso.',
+   obj:'Diferenciar a assistência de concorrentes que competem só por preço.',
+   conecta:'Após post preventivo de segunda, a terça eleva o tom com autoridade. Prepara o público para confiar no serviço.',
+   script:'"O que acontece quando você escolhe só pelo preço mais barato:\n\n→ Peça genérica que falha em meses\n→ Carcaça mal encaixada que solta depois\n→ Diagnóstico incorreto que não resolve\n→ Perda de dados por falta de cuidado\n→ Problema que volta pior\n\nBom serviço técnico tem custo justo."',
+   legenda:'Nem sempre a opção mais barata é a mais econômica. Quando o assunto é manutenção de equipamento, qualidade técnica e peça certa fazem toda a diferença no resultado.',
+   prox:'Troca de pasta térmica (Qua 24)'},
+
+  {grp:null,
+   day:'Qua',date:'24 jun',cat:'bastidor',tipo:'Reels',star:false,
+   title:'Troca de pasta térmica — serviço que salva o notebook',
+   hook:'Serviço pouco conhecido que resolve superaquecimento sem precisar trocar peça cara.',
+   obj:'Mostrar serviço técnico específico que gera curiosidade e educa ao mesmo tempo.',
+   conecta:'O tema superaquecimento foi tocado na semana 1. Este Reels apresenta uma solução diferente da limpeza.',
+   script:'Cena 1 — notebook esquentando:\n"Notebook esquentando muito mesmo depois de limpar?"\n\nCena 2 — pasta velha e ressecada sendo removida:\n"A pasta térmica seca com o tempo e perde a função."\n\nCena 3 — aplicação nova e fechamento:\n"Com a pasta nova, a temperatura caiu 15°C."',
+   legenda:'A pasta térmica transfere o calor do processador para o dissipador. Quando resseca, o notebook esquenta, trava e pode danificar peças permanentemente. Manutenção simples que evita estrago grande.',
+   prox:'Nem todo problema precisa de peça nova (Qui 25)'},
+
+  {grp:null,
+   day:'Qui',date:'25 jun',cat:'auto',tipo:'Post estático',star:false,
+   title:'Nem todo problema precisa de troca de peça',
+   hook:'Argumento que alivia o medo do custo. Desbloqueia quem estava adiando.',
+   obj:'Converter quem estava evitando por medo do preço.',
+   conecta:'Remove a principal objeção de quem acompanhou o conteúdo mas ainda não entrou em contato.',
+   script:'"O que já resolvemos sem trocar nada:\n\n→ Notebook lento — limpeza e otimização\n→ Superaquecimento — pasta térmica ou limpeza interna\n→ Computador não liga — conexão solta ou fonte\n→ Celular travando — formatação e limpeza de cache\n→ Carcaça solta — reencaixe e fixação das dobradiças\n\nPrimeiro o diagnóstico. Depois a decisão."',
+   legenda:'Muitos problemas têm solução sem precisar trocar nada. Um bom diagnóstico técnico mostra exatamente o que precisa ser feito — e o que não precisa.',
+   prox:'Carcaça — segundo ângulo (Sex 26)'},
+
+  {grp:null,
+   day:'Sex',date:'26 jun',cat:'star',tipo:'Reels',star:true,
+   title:'Carcaça nova — mesma máquina, visual de novo',
+   hook:'Segundo Reels de carcaça com ângulo diferente: foca no resultado final e no sentimento do cliente.',
+   obj:'Reforçar o serviço de carcaça com abordagem emocional. "Você vai amar o resultado."',
+   conecta:'Semana 2 mostrou o processo técnico. Este Reels fecha com o antes e depois mais dramático — o impacto visual.',
+   script:'Cena 1 — notebook com carcaça velha, arranhada, trincada:\n"Você ainda usa esse notebook, mas tá envergonhado de tirar ele da bolsa?"\n\nCena 2 — processo de troca rápido (corte dinâmico):\n"A gente resolve isso."\n\nCena 3 — notebook com carcaça nova, brilhando:\n"Mesma máquina. Visual de novo."\n\nTexto final:\n"Troca de carcaça de notebook — chama no WhatsApp."',
+   legenda:'Às vezes o notebook funciona perfeitamente, mas a aparência já cansou. Troca de carcaça resolve isso sem gastar com equipamento novo.',
+   prox:'Fechamento do mês com CTA (Sab 27)'},
+
+  {grp:null,
+   day:'Sab',date:'27 jun',cat:'conv',tipo:'Post estático',star:false,
+   title:'Por que escolher nossa assistência técnica?',
+   hook:'Post de diferenciais. Consolida tudo que foi mostrado no mês em argumentos de decisão.',
+   obj:'Criar o argumento final de escolha antes do encerramento do mês.',
+   conecta:'Quase 3 semanas de conteúdo construíram confiança. Este post coleta tudo e apresenta o argumento de decisão.',
+   script:'"Por que escolher nossa assistência?\n\n✔ Diagnóstico técnico antes de qualquer reparo\n✔ Atendimento transparente — você sabe o que está sendo feito\n✔ Troca de carcaça de notebook\n✔ Serviços para computador, celular e notebook\n✔ Testes antes da entrega\n✔ Orientação mesmo após o serviço"',
+   legenda:'Na hora de confiar seu equipamento a uma assistência técnica, o cuidado faz toda diferença. Aqui cada serviço é feito com análise, atenção e transparência.',
+   prox:'Fechamento do mês (Seg 29 e Ter 30)'},
+
+  {grp:'Últimos dias (29–30/jun)',theme:'Fechamento e chamada final',
+   day:'Seg',date:'29 jun',cat:'conv',tipo:'Reels',star:false,
+   title:'O que acontece quando você traz seu equipamento aqui',
+   hook:'Processo do ponto de vista do cliente. Elimina a última dúvida e chama para ação.',
+   obj:'CTA final do mês. Mostrar que o processo é simples, transparente e sem surpresa.',
+   conecta:'Encerra o ciclo com leveza. Quem acompanhou o mês inteiro chega aqui pronto para agir.',
+   script:'Cena 1 — cliente chega com equipamento:\n"Você chega, a gente ouve o problema."\n\nCena 2 — diagnóstico sendo feito:\n"Fazemos o diagnóstico antes de qualquer coisa."\n\nCena 3 — técnico apresentando o orçamento:\n"Você aprova com custo claro e transparente."\n\nCena 4 — equipamento pronto:\n"Você vai embora com o problema resolvido."',
+   legenda:'Sem surpresa, sem complicação. Você traz, a gente diagnostica, informa o custo e só executa com sua aprovação. Chame no WhatsApp ou venha até nós.',
+   prox:'Post final de junho (Ter 30)'},
+
+  {grp:null,
+   day:'Ter',date:'30 jun',cat:'star',tipo:'Post estático',star:true,
+   title:'Encerramento de junho — destaque: troca de carcaça',
+   hook:'Post de encerramento do mês com chamada direta para o serviço estrela de junho.',
+   obj:'Fechar o mês com o serviço destaque fixado na memória do público.',
+   conecta:'Fecha o arco de junho. A carcaça foi apresentada, demonstrada e agora é o gancho de encerramento.',
+   script:'"Junho foi sobre cuidar do seu notebook.\n\nE o serviço que mais surpreendeu?\nTroca de carcaça.\n\nNotebook com carcaça:\n→ Quebrada\n→ Trincada\n→ Solta\n→ Riscada\n\nNão precisa ser assim.\nChama a gente e agenda sua avaliação."',
+   legenda:'Julho começa em breve — e seu notebook pode chegar lá renovado. A gente cuida de tudo: diagnóstico, manutenção, troca de carcaça. É só chamar.',
+   prox:'Julho: novo ciclo com novos temas'}
+];
+
+let activeEl = null;
+
+function build(){
+  const feed = document.getElementById('feed');
+  let lastGrp = null;
+  posts.forEach((p,i)=>{
+    if(p.grp && p.grp !== lastGrp){
+      lastGrp = p.grp;
+      const sep = document.createElement('div');
+      sep.className = 'week-sep';
+      sep.innerHTML = `${p.grp}<span class="week-theme">— ${p.theme}</span>`;
+      feed.appendChild(sep);
+    }
+    const isstar = p.star;
+    const catMap = {
+      edu:{label:'Educativo',cls:'tag-edu',dot:'dot-edu',icon:'ti-books'},
+      bastidor:{label:'Bastidor / prova',cls:'tag-bastidor',dot:'dot-bastidor',icon:'ti-video'},
+      auto:{label:'Autoridade',cls:'tag-auto',dot:'dot-auto',icon:'ti-award'},
+      conv:{label:'Conversão',cls:'tag-conv',dot:'dot-conv',icon:'ti-arrow-right'},
+      star:{label:'Carcaça destaque',cls:'tag-star',dot:'dot-star',icon:'ti-star'}
+    };
+    const cm = catMap[p.cat];
+    const tipoIcon = p.tipo==='Reels'?'ti-video':p.tipo==='Carrossel'?'ti-layout-grid':'ti-photo';
+
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    const dot = document.createElement('div');
+    dot.className = `day-dot ${cm.dot}`;
+    row.appendChild(dot);
+
+    const card = document.createElement('div');
+    card.className = `day-card${isstar?' star-card':''}`;
+    card.innerHTML = `
+      <div class="dc-left">
+        <div class="dc-day">${p.day}</div>
+        <div class="dc-date" style="${isstar?'color:#993556':''}">${p.date.split(' ')[0]}</div>
+        <div style="font-size:9px;color:var(--color-text-tertiary)">${p.date.split(' ')[1]}</div>
+      </div>
+      <div class="dc-right">
+        <span class="dc-tag ${cm.cls}"><i class="ti ${tipoIcon}" style="font-size:10px" aria-hidden="true"></i>${p.tipo} · ${cm.label}</span>${isstar?'<span class="star-badge"><i class="ti ti-star" style="font-size:10px" aria-hidden="true"></i>Serviço destaque</span>':''}
+        <div class="dc-title">${p.title}</div>
+        <div class="dc-hook">${p.hook}</div>
+        <div class="dc-conn">
+          <span style="font-size:10px;color:var(--color-text-tertiary)">Conecta com:</span>
+          <span class="conn-pill">${p.prox}</span>
+        </div>
+      </div>`;
+    card.onclick = ()=>toggle(card,p,i);
+    row.appendChild(card);
+    feed.appendChild(row);
+
+    const det = document.createElement('div');
+    det.className = 'detail-box';
+    det.id = `d${i}`;
+    det.innerHTML = `
+      <button class="db-close" onclick="event.stopPropagation();closeD(${i})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button>
+      <div class="dl">Objetivo</div><div class="dv">${p.obj}</div>
+      <div class="dl">Conexão no fluxo</div><div class="dv">${p.conecta}</div>
+      <div class="dl">Roteiro / texto sugerido</div><div class="dv-script">${p.script}</div>
+      <div class="dl">Legenda</div><div class="dv" style="font-style:italic">${p.legenda}</div>`;
+    feed.appendChild(det);
+  });
+}
+
+function toggle(card,p,i){
+  const det = document.getElementById(`d${i}`);
+  const open = det.classList.contains('show');
+  if(activeEl && activeEl!==det){
+    activeEl.classList.remove('show');
+    activeEl.previousElementSibling?.querySelector('.day-card')?.classList.remove('active');
+  }
+  if(open){det.classList.remove('show');card.classList.remove('active');activeEl=null;}
+  else{det.classList.add('show');card.classList.add('active');activeEl=det;setTimeout(()=>det.scrollIntoView({behavior:'smooth',block:'nearest'}),50);}
+}
+function closeD(i){
+  const det=document.getElementById(`d${i}`);
+  det.classList.remove('show');
+  det.previousElementSibling?.querySelector('.day-card')?.classList.remove('active');
+  activeEl=null;
+}
+build();
+</script>
