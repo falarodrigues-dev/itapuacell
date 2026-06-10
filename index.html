@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ItapuaCell — Sistema Editorial V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#f4f7fb;--panel:#ffffff;--panel2:#f8fafc;--text:#101828;--muted:#667085;--line:#e4e7ec;--dark:#111827;
+ --blue:#2563eb;--purple:#7c3aed;--green:#079455;--orange:#f79009;--red:#d92d20;--pink:#db2777;--slate:#475467;
+ --edu:#6C63FF;--bast:#0DBF85;--auto:#F59E0B;--conv:#EF4444;--saz:#EC4899;
+ --shadow:0 14px 35px rgba(16,24,40,.08);--r:18px;--rs:12px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#eef4ff 0%,#f7f8fb 360px);font-family:Inter,system-ui,sans-serif;color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1440px;margin:0 auto;padding:22px 18px 70px}
+.topbar{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:44px;height:44px;border-radius:14px;background:#111827;color:#fff;display:grid;place-items:center;font-family:Space Grotesk;font-weight:800}.brand h1{font-family:Space Grotesk;margin:0;font-size:24px;line-height:1.05}.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.top-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 13px;font-weight:700;color:#344054;box-shadow:0 1px 2px rgba(16,24,40,.04)}.btn.primary{background:#111827;color:#fff;border-color:#111827}.btn.ghost{background:transparent;box-shadow:none}
+.tabs{display:flex;gap:8px;overflow:auto;padding:6px;margin:2px 0 18px;background:rgba(255,255,255,.65);border:1px solid rgba(228,231,236,.75);border-radius:16px;backdrop-filter:blur(10px)}.tab{white-space:nowrap;border:0;background:transparent;padding:10px 14px;border-radius:12px;color:#475467;font-weight:800}.tab.active{background:#111827;color:#fff}
+.view{display:none}.view.active{display:block}
+.grid-kpi{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:0 6px 18px rgba(16,24,40,.04)}.kpi small{display:block;color:var(--muted);font-weight:700;font-size:12px}.kpi strong{display:block;font-family:Space Grotesk;font-size:28px;margin-top:7px}.kpi span{font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-head h2{font-family:Space Grotesk;margin:0;font-size:18px}.panel-body{padding:16px}
+.filters{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.filters input,.filters select{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;min-width:150px;color:#344054}.filters input{flex:1;min-width:220px}
+.months{display:grid;grid-template-columns:1fr 1fr;gap:16px}.month h3{font-family:Space Grotesk;margin:0 0 10px;font-size:18px}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.dow{font-size:11px;color:var(--muted);font-weight:800;text-align:center;padding:4px}.day{min-height:94px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;position:relative}.day.empty{background:transparent;border:0}.day-num{font-weight:800;font-size:12px;color:#475467}.event{border:0;text-align:left;border-radius:10px;padding:7px;background:#f2f4f7;color:#111827;font-size:11px;font-weight:800;line-height:1.2;box-shadow:inset 3px 0 var(--slate)}.event small{display:block;color:#667085;font-weight:700;margin-top:3px}.event.cat-edu{box-shadow:inset 3px 0 var(--edu)}.event.cat-bastidor{box-shadow:inset 3px 0 var(--bast)}.event.cat-auto{box-shadow:inset 3px 0 var(--auto)}.event.cat-conv{box-shadow:inset 3px 0 var(--conv)}.event.cat-sazonal{box-shadow:inset 3px 0 var(--saz);background:#fdf2f8}
+.timeline{display:flex;flex-direction:column;gap:10px;max-height:760px;overflow:auto;padding-right:4px}.post-card{border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px;display:grid;grid-template-columns:64px 1fr;gap:12px}.datebox{border-radius:14px;background:#f2f4f7;display:grid;place-items:center;text-align:center;padding:8px;height:64px}.datebox b{font-family:Space Grotesk;font-size:22px}.datebox span{font-size:10px;color:#667085;font-weight:800}.post-title{font-weight:900;margin:0 0 5px;line-height:1.25}.post-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;background:#f2f4f7;color:#475467}.pill.reels{background:#eef4ff;color:#175cd3}.pill.feed{background:#f0fdf4;color:#087443}.pill.cat-edu{background:#eef0ff;color:var(--edu)}.pill.cat-bastidor{background:#e7fff6;color:#067647}.pill.cat-auto{background:#fff7e6;color:#b54708}.pill.cat-conv{background:#fef3f2;color:#b42318}.pill.cat-sazonal{background:#fdf2f8;color:#c11574}
+.hook{font-size:13px;color:#475467;line-height:1.45;margin:0 0 10px}.card-actions-row{display:flex;gap:8px;flex-wrap:wrap}.mini{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 9px;font-size:12px;font-weight:800;color:#344054}.mini.dark{background:#111827;color:#fff;border-color:#111827}.mini.ok{background:#ecfdf3;color:#067647;border-color:#abefc6}.status-select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 8px;font-size:12px;font-weight:800;color:#344054}
+.kanban{display:grid;grid-template-columns:repeat(7,minmax(220px,1fr));gap:12px;overflow:auto;padding-bottom:12px}.col{background:#f8fafc;border:1px solid var(--line);border-radius:16px;min-height:420px}.col h3{margin:0;padding:14px;border-bottom:1px solid var(--line);font-size:13px;display:flex;justify-content:space-between;gap:8px}.col-body{padding:10px;display:flex;flex-direction:column;gap:10px}.kan-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.kan-card b{display:block;font-size:13px;line-height:1.25;margin-bottom:6px}.kan-card p{font-size:12px;line-height:1.35;color:#667085;margin:0 0 10px}
+.library{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.lib-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.lib-box h3{font-family:Space Grotesk;margin:0 0 10px}.lib-box ul{margin:0;padding-left:18px;color:#475467;line-height:1.75;font-size:14px}
+.client-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.client-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}.client-card h3{margin:0 0 6px;font-size:15px}.client-card p{margin:0 0 10px;color:#667085;font-size:13px;line-height:1.45}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.42);display:none;z-index:50}.drawer{position:fixed;right:0;top:0;height:100vh;width:min(720px,100%);background:#fff;z-index:60;transform:translateX(105%);transition:.25s ease;box-shadow:-20px 0 50px rgba(16,24,40,.16);display:flex;flex-direction:column}.drawer.open{transform:translateX(0)}.drawer-backdrop.show{display:block}.drawer-head{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.drawer-head h2{font-family:Space Grotesk;margin:0;font-size:24px;line-height:1.1}.drawer-content{padding:18px;overflow:auto}.section{margin-bottom:18px}.section h4{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#667085;margin:0 0 8px}.box{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:13px;color:#344054;line-height:1.6;font-size:14px;white-space:pre-wrap}.scene{display:grid;grid-template-columns:34px 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}.scene-num{width:32px;height:32px;border-radius:10px;background:#111827;color:#fff;display:grid;place-items:center;font-weight:900}.scene b{display:block;margin-bottom:4px}.scene .fala{color:#175cd3;font-weight:700;margin:4px 0}.copy-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:12px 16px;font-weight:800;display:none;z-index:90}
+.metrics-form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metrics-form label{font-size:12px;color:#667085;font-weight:800}.metrics-form input,.metrics-form textarea{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:10px}.metrics-form textarea{grid-column:1/-1;min-height:80px}
+@media(max-width:1100px){.grid-kpi{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.months{grid-template-columns:1fr}.library{grid-template-columns:1fr}.client-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.app{padding:14px 10px 50px}.topbar{align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:stretch}.top-actions .btn{flex:1}.brand h1{font-size:20px}.grid-kpi{grid-template-columns:repeat(2,1fr);gap:9px}.kpi{padding:12px}.kpi strong{font-size:23px}.panel-head{align-items:flex-start;flex-direction:column}.filters input,.filters select{width:100%;min-width:0}.cal-grid{gap:4px}.day{min-height:74px;border-radius:10px;padding:5px}.event{font-size:9.5px;padding:5px;border-radius:8px}.post-card{grid-template-columns:52px 1fr;padding:10px;gap:9px}.datebox{height:52px}.datebox b{font-size:18px}.card-actions-row .mini,.status-select{width:100%;text-align:center}.drawer-head h2{font-size:19px}.drawer-content{padding:14px}.metrics-form{grid-template-columns:1fr}}
+
+/* ===== Ajustes V2.1: mobile, data alinhada, calendário por mês ===== */
+.post-card{grid-template-columns:86px 1fr;align-items:start;}
+.datebox{width:78px;height:78px;padding:9px;align-self:start;}
+.datebox>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:100%;line-height:1;}
+.datebox b{font-size:28px;line-height:.95;letter-spacing:-.04em;}
+.datebox span{display:block;line-height:1.05;white-space:nowrap;}
+.months{display:block;}
+.month{width:100%;}
+.month h3{font-size:24px;margin-bottom:16px;}
+.cal-grid{grid-template-columns:repeat(7,minmax(118px,1fr));gap:10px;}
+.day{min-height:138px;border-radius:16px;padding:10px;gap:8px;}
+.day.empty{display:block;background:#f8fafc;border:1px dashed #edf0f5;}
+.day-num{font-size:13px;}
+.event{font-size:12px;line-height:1.25;padding:9px 9px;border-radius:12px;word-break:normal;overflow-wrap:anywhere;display:block;width:100%;}
+.event small{font-size:10px;line-height:1.25;}
+.filters .month-filter{min-width:170px;background:#111827;color:#fff;border-color:#111827;font-weight:800;}
+.library{grid-template-columns:repeat(3,minmax(0,1fr));}
+.lib-box li{margin-bottom:6px;}
+@media(max-width:900px){.cal-grid{grid-template-columns:repeat(7,minmax(96px,1fr));overflow-x:auto;padding-bottom:10px}.month{overflow-x:auto}.day{min-height:126px}.event{font-size:11px}.post-card{grid-template-columns:74px 1fr}.datebox{width:68px;height:72px}.datebox b{font-size:25px}}
+@media(max-width:680px){.post-card{grid-template-columns:1fr;}.datebox{width:100%;height:auto;min-height:58px;}.datebox>div{flex-direction:row;gap:6px;}.datebox b{font-size:24px}.cal-grid{grid-template-columns:repeat(7,minmax(92px,1fr));}.day{min-height:116px}.panel-body{padding:12px}.library{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">IC</div><div><h1>Sistema Editorial ItapuaCell</h1><p>Dashboard + calendário + kanban + biblioteca + modo cliente · Junho/Julho 2026</p></div></div>
+    <div class="top-actions"><button class="btn" data-action="export">Exportar dados</button><button class="btn" data-action="reset">Limpar status</button><button class="btn primary" data-tab-go="cliente">Modo cliente</button></div>
+  </header>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button><button class="tab" data-tab="calendario">Calendário</button><button class="tab" data-tab="kanban">Kanban</button><button class="tab" data-tab="biblioteca">Biblioteca</button><button class="tab" data-tab="metricas">Métricas</button><button class="tab" data-tab="cliente">Cliente</button>
+  </nav>
+
+  <section id="dashboard" class="view active">
+    <div class="grid-kpi" id="kpis"></div>
+    <div class="layout">
+      <div class="panel"><div class="panel-head"><h2>Próximos conteúdos</h2><button class="btn ghost" data-tab-go="calendario">Ver calendário</button></div><div class="panel-body"><div id="nextPosts" class="timeline"></div></div></div>
+      <div class="panel"><div class="panel-head"><h2>Resumo estratégico</h2><button class="btn ghost" data-tab-go="kanban">Ver produção</button></div><div class="panel-body"><div id="strategySummary"></div></div></div>
+    </div>
+  </section>
+
+  <section id="calendario" class="view">
+    <div class="panel"><div class="panel-head"><h2>Calendário editorial</h2><div class="filters"><select id="filterMonth" class="month-filter"><option value="5">Junho 2026</option><option value="6">Julho 2026</option></select><input id="search" placeholder="Buscar post, roteiro, legenda..."><select id="filterCat"><option value="all">Todas categorias</option></select><select id="filterStatus"><option value="all">Todos status</option></select></div></div><div class="panel-body"><div class="months" id="calendarMonths"></div></div></div>
+  </section>
+
+  <section id="kanban" class="view"><div class="panel"><div class="panel-head"><h2>Kanban de produção</h2><p style="margin:0;color:#667085;font-size:13px">Altere o status no card para mover automaticamente.</p></div><div class="panel-body"><div class="kanban" id="kanbanBoard"></div></div></div></section>
+
+  <section id="biblioteca" class="view"><div class="panel"><div class="panel-head"><h2>Biblioteca de padrões</h2><button class="btn" data-action="copy-library">Copiar biblioteca</button></div><div class="panel-body"><div class="library" id="library"></div></div></div></section>
+
+  <section id="metricas" class="view"><div class="panel"><div class="panel-head"><h2>Métricas pós-publicação</h2><select id="metricPost"></select></div><div class="panel-body"><div id="metricEditor"></div></div></div></section>
+
+  <section id="cliente" class="view"><div class="panel"><div class="panel-head"><h2>Visão do cliente</h2><p style="margin:0;color:#667085;font-size:13px">Visual limpo para aprovação: data, tema, objetivo e status.</p></div><div class="panel-body"><div class="client-grid" id="clientList"></div></div></div></section>
+</div>
+
+<div class="drawer-backdrop" id="backdrop"></div><aside class="drawer" id="drawer"><div class="drawer-head"><div><div id="drawerPills" class="post-meta"></div><h2 id="drawerTitle"></h2><p id="drawerHook" class="hook"></p></div><button class="btn" data-action="close-drawer">Fechar</button></div><div class="drawer-content" id="drawerContent"></div></aside><div class="toast" id="toast">Copiado!</div>
+
+<script>
+const posts = [
+
+  /* ══════ SEMANA 1 — Apresentação ══════ */
+  // QUA 10/JUN → Reels
+  {week:1,dow:'QUA',d:'10',m:'JUN',tipo:'Reels',cat:'bastidor',
+   title:'Bastidores da ItapuaCell',
+   hook:'Bancada, ferramentas e ambiente real. Primeira impressão da marca.',
+   obj:'Apresentar a ItapuaCell de forma humana antes de qualquer serviço ou texto.',
+   prox:'O que fazemos aqui (QUI 11/06)',
+   cenas:[
+     {visual:'Plano aberto da bancada com ferramentas organizadas',fala:'"Por trás de cada conserto existe análise, cuidado e técnica."',dica:'Luz natural ou ring light. Mostrar diversidade de ferramentas.'},
+     {visual:'Close no técnico avaliando notebook',fala:'"Aqui cada equipamento passa por uma verificação completa."',dica:'Câmera por cima do ombro. Mostrar foco e concentração.'},
+     {visual:'Equipamento ligando na bancada',fala:'"Diagnóstico correto. Serviço bem feito. Cliente satisfeito."',dica:'Tela acendendo como desfecho. Corte seco para logo da ItapuaCell.'}
+   ]},
+
+  // QUI 11/JUN → Feed
+  {week:1,dow:'QUI',d:'11',m:'JUN',tipo:'Feed',cat:'edu',
+   title:'O que a ItapuaCell faz por você',
+   hook:'Arte com os 3 serviços: computador, notebook e celular.',
+   obj:'Deixar claro o portfólio para novos seguidores.',
+   prox:'Sinais de que seu notebook pede socorro (SEX 12/06)',
+   ideia:'Arte limpa com fundo escuro, ícones dos 3 dispositivos e os 3 pilares: diagnóstico · manutenção · transparência. Logo da ItapuaCell no rodapé.',
+   copy:'ItapuaCell — Assistência técnica especializada em:\n→ Computador\n→ Notebook\n→ Celular\n\nDiagnóstico técnico · Manutenção segura · Atendimento transparente\n\nSeu equipamento com problema? Chama a gente.',
+   legenda:'Aqui na ItapuaCell realizamos diagnóstico, manutenção e reparos em computadores, notebooks e celulares com atenção, cuidado e total transparência. Sempre buscando a melhor solução para você.'},
+
+  // SEX 12/JUN → Reels
+  {week:1,dow:'SEX',d:'12',m:'JUN',tipo:'Reels',cat:'edu',
+   title:'Por que o computador fica lento com o tempo?',
+   hook:'Resposta para dúvida universal. Alta probabilidade de compartilhamento.',
+   obj:'Alcance orgânico por identificação. Reforça autoridade da ItapuaCell.',
+   prox:'Sinais do notebook (SAB 13/06)',
+   cenas:[
+     {visual:'Computador lento — barra de carregamento travada na tela',fala:'"Seu computador tá lento? Não é culpa sua."',dica:'Gravar a tela real travada. Identificação imediata do público.'},
+     {visual:'Técnico mostrando HD cheio na tela',fala:'"Arquivos acumulados, programas no início, HD cheio..."',dica:'Overlay com lista rápida. Fonte grande, leitura fácil no mobile.'},
+     {visual:'Técnico na bancada realizando a limpeza/otimização',fala:'"A ItapuaCell faz o diagnóstico e resolve. Sem achismo."',dica:'CTA natural. Mostrar o processo real, não só o resultado.'},
+   ]},
+
+  // SEG 15/JUN → SAZONAL: Dia dos Namorados
+  {week:1,dow:'SAB',d:'13',m:'JUN',tipo:'Reels',cat:'sazonal',sazonal:true,
+   title:'Dia dos Namorados — o presente que não trava, não esquenta e não morre',
+   hook:'12 de junho, Dia dos Namorados. Gancho: "o melhor presente é um celular que funciona de verdade".',
+   obj:'Alcance orgânico máximo. Associar a ItapuaCell a datas afetivas com tom leve e bem-humorado.',
+   prox:'Brasil x Marrocos Copa (SEG 15/06)',
+   cenas:[
+     {visual:'Casal com celular — um mostrando a tela quebrada pro outro',fala:'"Dia dos Namorados chegou. E o celular dela resolveu colaborar."',dica:'Tom bem-humorado. Situação que todo mundo já viveu.'},
+     {visual:'Técnico recebendo o celular com cuidado na bancada',fala:'"Na ItapuaCell a gente conserta antes do jantar."',dica:'Mostrar urgência real. O técnico age rápido.'},
+     {visual:'Celular funcionando, tela nova acendendo',fala:'"Tela nova, bateria cheia e o número dela salvo. Missão cumprida. 💕"',dica:'Tom afetivo e engraçado. Encerrar com CTA + "Feliz Dia dos Namorados".'}
+   ],
+   legenda:'Dia dos Namorados é amanhã — e o celular resolveu apresentar problema? 💕 Na ItapuaCell a gente salva o seu presente antes do jantar. Tela quebrada, bateria que não carrega, celular travando — chama agora no WhatsApp. Porque amor é também cuidar do equipamento! 😄'},
+
+  // SEG 15/JUN → SAZONAL: Brasil x Marrocos Copa 2026
+  {week:1,dow:'SEG',d:'15',m:'JUN',tipo:'Reels',cat:'sazonal',sazonal:true,
+   title:'Brasil x Marrocos hoje às 19h — seu streaming vai aguentar?',
+   hook:'Estreia do Brasil na Copa 2026. Jogo às 19h no MetLife Stadium (Nova York). "Seu equipamento não pode falhar agora."',
+   obj:'Alcance orgânico máximo associando a ItapuaCell à estreia da Seleção. Urgência real: jogo é hoje.',
+   prox:'Limpeza interna na prática (TER 16/06)',
+   cenas:[
+     {visual:'Camisa amarela da Seleção e celular/notebook na bancada da ItapuaCell',fala:'"Hoje o Brasil estreia na Copa! Brasil x Marrocos, 19h!"',dica:'Grave de manhã. Postar cedo gera mais alcance antes do jogo.'},
+     {visual:'Técnico testando notebook e celular',fala:'"Mas o seu equipamento está preparado pro jogo?"',dica:'Tom de desafio amigável. Mostrar o técnico testando em tempo real.'},
+     {visual:'Tela travada / celular esquentando',fala:'"Notebook esquentando, celular travando, streaming caindo..."',dica:'Encenação rápida dos problemas. Identificação imediata.'},
+     {visual:'Equipamento funcionando perfeitamente com a camisa do Brasil ao fundo',fala:'"ItapuaCell resolve antes do apito. Chama no WhatsApp agora. Vai Brasil! 🇧🇷"',dica:'CTA urgente. Mostrar número. Tom festivo mas direto.'}
+   ],
+   legenda:'HOJE É DIA DE COPA! 🇧🇷⚽ Brasil x Marrocos às 19h no MetLife Stadium. Seu notebook vai aguentar o streaming? Seu celular vai durar o jogo inteiro? Qualquer sinal de problema — esquentando, travando, bateria fraca — chama a ItapuaCell agora. A gente resolve antes do apito. Vai Brasil!'},
+
+  /* ══════ SEMANA 2 — Celular: problemas e soluções ══════ */
+  // TER 16/JUN → Reels
+  {week:2,dow:'TER',d:'16',m:'JUN',tipo:'Reels',cat:'bastidor',
+   title:'Limpeza interna de notebook na prática',
+   hook:'Antes e depois com poeira acumulada. Visual impactante, alto compartilhamento.',
+   obj:'Mostrar serviço real da ItapuaCell. Fechar com prova visual de qualidade.',
+   prox:'Antes de trocar o celular (QUA 17/06)',
+   cenas:[
+     {visual:'Notebook fechado — aparência normal por fora',fala:'"Parece normal por fora, né?"',dica:'Câmera na mão. Construir suspense antes de abrir.'},
+     {visual:'Notebook aberto revelando poeira acumulada',fala:'"Por dentro, é isso que causa superaquecimento e travamento."',dica:'Ângulo dramático. Iluminar bem a sujeira.'},
+     {visual:'Técnico da ItapuaCell limpando com ar comprimido e pincel',fala:'"Limpeza interna melhora o desempenho e evita danos maiores."',dica:'Timelapse funciona bem. Mostrar o processo completo.'},
+     {visual:'Notebook funcionando, ventilador quieto',fala:'"Manutenção preventiva também é economia. ItapuaCell."',dica:'Mostrar temperatura normalizada ou benchmark rápido.'}
+   ]},
+
+  // QUA 17/JUN → Feed
+  {week:2,dow:'QUA',d:'17',m:'JUN',tipo:'Feed',cat:'edu',
+   title:'Antes de trocar o celular, faça uma avaliação',
+   hook:'Mensagem que interrompe o ciclo de consumo impulsivo.',
+   obj:'Mostrar que reparo costuma ser mais vantajoso que troca.',
+   prox:'Troca de tela na prática (QUI 18/06)',
+   ideia:'Arte com dois caminhos: "Trocar (caro)" vs "Consertar com a ItapuaCell (inteligente)". Fundo escuro, tipografia forte, destaque em verde no lado direito.',
+   copy:'Seu celular parou de carregar?\nNem sempre é hora de trocar.\n\nProblemas que a ItapuaCell resolve:\n→ Falha no carregamento\n→ Bateria descarregando rápido\n→ Tela com defeito\n→ Aparelho travando\n→ Botões sem resposta\n\nAvaliação técnica primeiro. Decisão depois.',
+   legenda:'Antes de trocar de celular, faça uma avaliação técnica na ItapuaCell. Muitas vezes o problema tem solução simples e o aparelho volta a funcionar como novo — por muito menos que um aparelho novo.'},
+
+  // QUI 18/JUN → Reels
+  {week:2,dow:'QUI',d:'18',m:'JUN',tipo:'Reels',cat:'bastidor',
+   title:'Troca de tela de celular na prática',
+   hook:'Desmontagem, instalação e teste final. Sequência que gera credibilidade.',
+   obj:'Provar competência técnica da ItapuaCell com imagem real.',
+   prox:'Corpus Christi + Brasil x Haiti (SEX 19/06)',
+   cenas:[
+     {visual:'Close na tela danificada do celular',fala:'"Tela quebrada?"',dica:'Iluminar o dano. Câmera bem próxima. 2-3 segundos apenas.'},
+     {visual:'Mãos do técnico desmontando com cuidado',fala:'"O reparo começa pelo diagnóstico completo."',dica:'Mostrar cuidado e organização. Parafusos separados.'},
+     {visual:'Instalação da nova tela',fala:'"Cada peça encaixada com precisão."',dica:'Timelapse funciona. Mostrar alinhamento perfeito.'},
+     {visual:'Teste final — touch, brilho, resposta',fala:'"Antes de entregar pra você, tudo é testado. ItapuaCell."',dica:'Dedos deslizando, brilho ajustado, câmera funcionando.'}
+   ]},
+
+  // SEX 19/JUN → SAZONAL: Corpus Christi + Brasil x Haiti
+  {week:2,dow:'SEX',d:'19',m:'JUN',tipo:'Reels',cat:'sazonal',sazonal:true,
+   title:'Corpus Christi + Brasil x Haiti 21h30 — feriado duplo em Salvador!',
+   hook:'Feriado de Corpus Christi em Salvador + jogo do Brasil às 21h30 na Filadélfia. Combo de alcance explosivo.',
+   obj:'Dois ganchos no mesmo dia. Mostrar que a ItapuaCell está de plantão no feriado — isso é diferencial.',
+   prox:'5 mitos sobre assistência técnica (SAB 20/06)',
+   cenas:[
+     {visual:'Calendário no celular mostrando o feriado + horário do jogo',fala:'"Feriado em Salvador hoje! E o Brasil joga às 21h30!"',dica:'Mostrar o próprio celular. Prova real e informal.'},
+     {visual:'Pessoa no sofá montando setup pra assistir o jogo',fala:'"Feriado, sofá, pipoca e Brasil x Haiti às 21h30..."',dica:'Cena cotidiana. Tom descontraído e animado.'},
+     {visual:'Celular com bateria baixa / notebook travando',fala:'"Só não pode é o equipamento trair na hora do gol!"',dica:'Humor leve. Não alarmista — é feriado!'},
+     {visual:'Técnico da ItapuaCell com sorriso, de plantão',fala:'"A ItapuaCell está aberta no feriado. Resolve antes das 21h30. ⚽"',dica:'CTA humano e diferenciado. "Aberto no feriado" é vantagem real.'}
+   ],
+   legenda:'Corpus Christi 🙏 + Brasil x Haiti às 21h30 ⚽ — Salvador tem feriado E jogo hoje! A ItapuaCell está de plantão. Celular, notebook ou computador com problema? Chama no WhatsApp e resolve antes do jogo. Vai Brasil! 🇧🇷'},
+
+  // SAB 20/JUN → Reels
+  {week:2,dow:'SAB',d:'20',m:'JUN',tipo:'Reels',cat:'edu',
+   title:'5 mitos sobre assistência técnica que te impedem de resolver o problema',
+   hook:'Quebrar objeções que impedem o cliente de buscar atendimento.',
+   obj:'Remover o medo do preço, da demora e da enganação antes de qualquer contato.',
+   prox:'São João + Brasil x Escócia (SEG 22/06)',
+   cenas:[
+     {visual:'Texto na tela: "VAI SER CARO"',fala:'"Mito 1: vai ser caro. Na ItapuaCell o diagnóstico é gratuito."',dica:'Corte rápido entre mitos. Cada um dura 3-4 segundos.'},
+     {visual:'Texto na tela: "VAI DEMORAR SEMANAS"',fala:'"Mito 2: vai demorar semanas. A maioria sai em 24 a 48 horas."',dica:'Ritmo acelerado. Manter energia alta entre os cortes.'},
+     {visual:'Texto na tela: "VÃO PERDER MEUS DADOS"',fala:'"Mito 3: vão perder seus dados. Backup antes de qualquer serviço."',dica:'Tranquilizador. Mostrar o técnico fazendo backup.'},
+     {visual:'Logo da ItapuaCell na tela',fala:'"Na ItapuaCell: transparência do início ao fim. Orçamento antes, aprovação sua."',dica:'Encerrar com confiança. CTA direto para o WhatsApp.'}
+   ]},
+
+  // SEG 22/JUN → Feed
+  {week:2,dow:'SEG',d:'22',m:'JUN',tipo:'Feed',cat:'auto',
+   title:'O que fazer quando o celular cai na água',
+   hook:'Informação de emergência que todo mundo vai salvar.',
+   obj:'Máximo salvamento orgânico. Posicionar ItapuaCell como referência de urgência.',
+   prox:'São João + Brasil x Escócia (TER 23/06)',
+   ideia:'Arte com 4 passos rápidos em formato checklist. Fundo escuro, ícones grandes, cor de destaque vermelho para o que NÃO fazer e verde para o que fazer. Urgente e claro.',
+   copy:'Celular caiu na água? Siga isso agora:\n\n✅ FAÇA:\n→ Tire da água imediatamente\n→ Desligue na hora (não tente ligar)\n→ Seque a superfície com pano seco\n→ Leve pra ItapuaCell o quanto antes\n\n❌ NÃO FAÇA:\n→ Não ligue o aparelho\n→ Não use secador de cabelo\n→ Não chacoalhe\n→ Não coloque no arroz (isso é mito)\n\nCada hora importa.',
+   legenda:'Celular caiu na água? Não entre em pânico — mas também não perca tempo. Cada hora sem o atendimento certo aumenta o risco de dano permanente. Siga os passos acima e chama a ItapuaCell. A gente avalia e te diz o que pode ser feito. 💧'},
+
+  /* ══════ SEMANA 3 — Notebook: aprofundamento e autoridade ══════ */
+  // TER 23/JUN → SAZONAL: Véspera do São João
+  {week:3,dow:'TER',d:'23',m:'JUN',tipo:'Reels',cat:'sazonal',sazonal:true,
+   title:'Véspera de São João — e o celular carregado pra registrar tudo',
+   hook:'23 de junho, véspera do maior São João do mundo em Salvador. Todo mundo vai registrar a festa — o celular precisa estar perfeito.',
+   obj:'Alcance orgânico com orgulho cultural baiano + conversão suave. Urgência: "arruma antes da festa".',
+   prox:'São João + Brasil x Escócia (QUA 24/06)',
+   cenas:[
+     {visual:'Decoração junina colorida — bandeirolas, fogos',fala:'"Amanhã é São João em Salvador! O maior do mundo! 🎉"',dica:'Imagem festiva e colorida. Energia alta desde o início.'},
+     {visual:'Pessoa tentando filmar a festa com celular travando',fala:'"Mas vai ser péssimo se o celular morrer na hora do forró..."',dica:'Tom bem-humorado. Situação reconhecível.'},
+     {visual:'Técnico da ItapuaCell verificando bateria / tela',fala:'"Traz hoje pra ItapuaCell. A gente resolve antes da meia-noite."',dica:'Urgência real. Mostrar o atendimento rápido.'},
+     {visual:'Celular com bateria cheia, câmera aberta',fala:'"São João sem perrengue tecnológico. É com a ItapuaCell. 🎆"',dica:'CTA festivo. Encerrar com energia junina.'}
+   ],
+   legenda:'Véspera de São João em Salvador! 🎉 Amanhã o mundo para pro maior São João do mundo — e a ItapuaCell tá aqui pra garantir que seu celular não perde um minuto da festa. Bateria, tela, câmera. Traz hoje, leva pra festa. Axé! 🙏'},
+
+  // QUA 24/JUN → SAZONAL: São João + Brasil x Escócia
+  {week:3,dow:'QUA',d:'24',m:'JUN',tipo:'Feed',cat:'sazonal',sazonal:true,
+   title:'São João + Brasil x Escócia 19h — Salvador tem duas festas hoje!',
+   hook:'Feriado municipal de São João em Salvador (24/06) + último jogo do Brasil na fase de grupos às 19h em Miami. O dia mais festivo do mês.',
+   obj:'Alcance máximo com dois ganchos culturais fortes. Posicionar a ItapuaCell como parte do dia de festa.',
+   prox:'Notebook para jogos (QUI 25/06)',
+   ideia:'Arte dividida: metade com bandeirolas coloridas do São João / metade com verde-amarelo da Copa. Título: "Hoje tem forró E tem Copa." Visual festivo com cores juninas e cores da Seleção. Logo da ItapuaCell discreto no rodapé.',
+   copy:'Hoje em Salvador é São João 🎉\nE às 19h o Brasil fecha a fase de grupos contra a Escócia ⚽\n\nForró de manhã.\nJogo à tarde.\nFesta à noite.\n\nSó não pode é o equipamento estragar a festa:\n→ Celular morrendo na hora do gol\n→ Notebook travando no streaming\n→ Câmera falhando na hora do forró\n\nItapuaCell está aqui.\nA gente cuida do equipamento. Você cuida da festa.',
+   legenda:'HOJE SALVADOR PARA! 🎉🇧🇷⚽ São João — feriado municipal — E Brasil x Escócia às 19h no Hard Rock Stadium em Miami. Se o seu celular ou notebook está dando trabalho, chama a ItapuaCell antes do jogo. Que a festa seja completa — sem tela piscando na hora do gol! Vai Brasil! Axé!'},
+
+  // QUI 25/JUN → Reels
+  {week:3,dow:'QUI',d:'25',m:'JUN',tipo:'Reels',cat:'auto',
+   title:'Notebook para jogos: o que realmente importa',
+   hook:'Atinge quem usa ou quer usar notebook para games. Autoridade técnica com linguagem acessível.',
+   obj:'Gerar consultas sobre upgrade na ItapuaCell.',
+   prox:'Superaquecimento: diagnóstico na bancada (SEX 26/06)',
+   cenas:[
+     {visual:'Notebook rodando jogo — FPS caindo na tela',fala:'"Notebook travando nos jogos? Pode não ser falta de potência."',dica:'Gravar a tela real com o FPS caindo. Identificação imediata.'},
+     {visual:'Técnico mostrando placa de vídeo integrada vs dedicada',fala:'"Placa integrada, RAM baixa, HD lento — esses são os vilões."',dica:'Overlay técnico mas simples. Usar linguagem de gamer.'},
+     {visual:'Upgrade sendo feito na bancada da ItapuaCell',fala:'"Antes de trocar o notebook, traz na ItapuaCell. Upgrade certo resolve."',dica:'Mostrar o processo de upgrade. Gera confiança técnica.'},
+   ]},
+
+  // SEX 26/JUN → Reels
+  {week:3,dow:'SEX',d:'26',m:'JUN',tipo:'Reels',cat:'bastidor',
+   title:'Superaquecimento: diagnóstico completo na bancada',
+   hook:'Processo real de como a ItapuaCell identifica a causa do calor excessivo.',
+   obj:'Credibilidade técnica com bastidor real. Autoridade visual.',
+   prox:'Vale a pena fazer upgrade de RAM e SSD? (SAB 27/06)',
+   cenas:[
+     {visual:'Técnico medindo temperatura com software',fala:'"Primeiro passo: medir a temperatura real do processador."',dica:'Mostrar o software com os números — dado real agrega confiança.'},
+     {visual:'Notebook aberto, ventilador com poeira',fala:'"Ventilação comprometida por poeira. Causa mais comum."',dica:'Iluminar bem a sujeira acumulada. Mostrar o acúmulo.'},
+     {visual:'Pasta térmica ressecada sendo removida',fala:'"Pasta térmica ressecada — segunda causa mais frequente."',dica:'Close na pasta velha. Contraste com a nova.'},
+     {visual:'Temperatura caindo após manutenção — gráfico na tela',fala:'"Após a manutenção da ItapuaCell: temperatura normalizada."',dica:'Antes e depois nos números do software. Impacto visual.'}
+   ]},
+
+  // SAB 27/JUN → Feed
+  {week:3,dow:'SAB',d:'27',m:'JUN',tipo:'Feed',cat:'edu',
+   title:'Vale a pena fazer upgrade de RAM e SSD no seu notebook?',
+   hook:'Decisão que muita gente adia. Dar clareza gera ação.',
+   obj:'Gerar consultas sobre upgrade na ItapuaCell — serviço de alto valor.',
+   prox:'Recuperação de dados (SEG 29/06)',
+   ideia:'Arte com dois cenários em paralelo: "Notebook atual lento" vs "Após upgrade ItapuaCell". Números concretos de performance. Fundo escuro, cores contrastantes.',
+   copy:'Seu notebook está lento?\nAntes de trocar, considere o upgrade.\n\nRAM: mais memória = mais programas ao mesmo tempo\n→ 8GB mínimo hoje. 16GB é o ideal.\n\nSSD: a diferença que você mais vai sentir\n→ Boot em ~10s. HD leva ~60s. 6x mais rápido.\n\nCusto do upgrade: R$ 200–600\nNotebook novo: R$ 2.000+\n\nA conta fecha na ItapuaCell.',
+   legenda:'Upgrade de RAM e SSD é o serviço que mais transforma um notebook lento em um equipamento de qualidade — por uma fração do custo de um aparelho novo. Nem todo notebook aceita upgrade, por isso a ItapuaCell avalia gratuitamente antes de qualquer coisa.'},
+
+  /* ══════ SEMANA 4 — Conversão ══════ */
+  // SEG 29/JUN → Reels
+  {week:4,dow:'SEG',d:'29',m:'JUN',tipo:'Reels',cat:'auto',
+   title:'Recuperação de dados: o que é possível recuperar?',
+   hook:'Situação de desespero que gera busca imediata. "Perdi tudo" é urgente.',
+   obj:'Abrir a semana de conversão com serviço de alto valor percebido.',
+   prox:'Quando formatar? (TER 30/06)',
+   cenas:[
+     {visual:'HD na bancada, tela mostrando erro de leitura',fala:'"Arquivos sumidos depois de uma pane?"',dica:'Mostrar a mensagem de erro real. Soa mais verdadeiro.'},
+     {visual:'Técnico conectando HD em equipamento especializado',fala:'"A ItapuaCell usa técnicas específicas para recuperar dados corrompidos."',dica:'Equipamento de recuperação agrega credibilidade.'},
+     {visual:'Arquivos aparecendo na tela aos poucos',fala:'"Fotos, documentos, anos de memória — sendo recuperados."',dica:'Lista de arquivos em tempo real. Poderoso visualmente.'},
+     {visual:'Técnico entregando pen drive com dados',fala:'"Quanto antes você procura ajuda, maiores as chances."',dica:'Urgência no CTA. Não deixar para depois.'}
+   ]},
+
+  // TER 30/JUN → Feed
+  {week:4,dow:'TER',d:'30',m:'JUN',tipo:'Feed',cat:'edu',
+   title:'Quando formatar? E quando não formatar?',
+   hook:'Resposta objetiva para dúvida que gera insegurança no público.',
+   obj:'Responder a dúvida e posicionar a ItapuaCell como lugar certo para a decisão.',
+   prox:'2 de Julho — Independência da Bahia (QUA 01/07)',
+   ideia:'Arte dividida em dois lados: "Formate se" (fundo verde) vs "Não formate se" (fundo vermelho). Layout de decisão visual. Logo da ItapuaCell no centro.',
+   copy:'Formatar resolve?\n\n✅ Sim, formate se:\n→ Sistema lento mesmo após limpeza\n→ Vírus comprometeram o sistema\n→ Vai vender ou passar o equipamento\n\n❌ Não formate se:\n→ Problema é de hardware (HD, RAM, fonte)\n→ Você não fez backup ainda\n→ É problema de um programa só\n\nNa dúvida: diagnóstico na ItapuaCell primeiro.',
+   legenda:'Formatar sem diagnóstico pode resolver um problema superficial e esconder um problema de hardware mais sério. A ItapuaCell identifica o que realmente precisa ser feito — e o que não precisa.'},
+
+  // QUA 01/JUL → SAZONAL: Independência da Bahia
+  {week:4,dow:'QUA',d:'01',m:'JUL',tipo:'Reels',cat:'sazonal',sazonal:true,
+   title:'2 de Julho — Independência da Bahia! ItapuaCell é daqui.',
+   hook:'Feriado estadual mais importante da Bahia. A data cívica mais orgulhosa do baiano. Gancho cultural fortíssimo.',
+   obj:'Engajamento com identidade baiana + posicionar a ItapuaCell como marca local de confiança.',
+   prox:'Nem todo problema precisa de troca (QUI 02/07)',
+   cenas:[
+     {visual:'Bandeira da Bahia e decoração do 2 de Julho nas ruas de Salvador',fala:'"2 de Julho — Independência da Bahia! A Bahia que não se dobra."',dica:'Imagens de Salvador no feriado. Orgulho local.'},
+     {visual:'Técnico da ItapuaCell trabalhando na bancada',fala:'"A ItapuaCell também é daqui. Baiana, de Salvador, pra Salvador."',dica:'Humanizar a marca. Mostrar o rosto da equipe.'},
+     {visual:'Equipamento sendo entregue funcionando ao cliente',fala:'"Baiano não desiste. A gente resolve o equipamento de todo mundo."',dica:'Encerrar com orgulho e CTA natural.'}
+   ],
+   legenda:'Feliz 2 de Julho, Salvador! 🎉 Dia de celebrar a força e a resistência da Bahia. A ItapuaCell também é daqui — nascida em Salvador, pra servir Salvador. Notebook, computador ou celular com problema? Chama. Porque baiano não deixa equipamento parado. Axé! 🙏'},
+
+  // QUI 02/JUL → Feed
+  {week:4,dow:'QUI',d:'02',m:'JUL',tipo:'Feed',cat:'auto',
+   title:'Nem todo problema precisa de troca de peça',
+   hook:'Alivia o medo do custo alto. Desbloqueia quem estava adiando.',
+   obj:'Converter o público que esperava com medo do preço.',
+   prox:'Resultado real: antes e depois (SEX 03/07)',
+   ideia:'Arte com lista de problemas e as soluções da ItapuaCell que não envolveram troca de peça. Mostrar que inteligência técnica economiza.',
+   copy:'O que a ItapuaCell já resolveu sem trocar nada:\n\n→ Notebook lento → limpeza e otimização do sistema\n→ Tela piscando → ajuste de conector ou driver\n→ Superaquecimento → limpeza + pasta térmica\n→ Computador que não liga → fonte ou conexão solta\n→ Celular travando → formatação e limpeza de cache\n\nPrimeiro o diagnóstico.\nDepois a decisão.',
+   legenda:'Muitos problemas têm solução sem precisar trocar nada. Um bom diagnóstico técnico — como o que a ItapuaCell faz — mostra exatamente o que precisa ser feito e o que não precisa.'},
+
+  // SEX 03/JUL → Reels
+  {week:4,dow:'SEX',d:'03',m:'JUL',tipo:'Reels',cat:'conv',
+   title:'Resultado real: antes e depois na ItapuaCell',
+   hook:'Prova social com caso real. Post de conversão direta.',
+   obj:'Converter seguidores que já confiam mas ainda não fizeram contato.',
+   prox:'O processo completo da ItapuaCell (SAB 04/07)',
+   cenas:[
+     {visual:'Notebook travando — tela de carregamento infinita',fala:'"Cliente chegou com notebook que travava toda hora."',dica:'Mostrar o problema real. Identificação imediata.'},
+     {visual:'Diagnóstico na bancada — técnico mostrando o problema',fala:'"Diagnóstico: RAM com defeito + pasta térmica ressecada."',dica:'Mostrar os componentes. Transparência total.'},
+     {visual:'Solução sendo aplicada — nova RAM sendo instalada',fala:'"Solução: troca de módulo de RAM + manutenção completa."',dica:'Mostrar o processo. Profissionalismo visual.'},
+     {visual:'Notebook abrindo rápido, cliente feliz',fala:'"Resultado: notebook como novo. Por muito menos que um novo. ItapuaCell."',dica:'Desfecho positivo. CTA no final.'}
+   ]},
+
+  // SAB 04/JUL → Feed
+  {week:4,dow:'SAB',d:'04',m:'JUL',tipo:'Feed',cat:'conv',
+   title:'O que acontece quando você traz seu equipamento pra ItapuaCell',
+   hook:'Processo completo do ponto de vista do cliente. Elimina a última dúvida.',
+   obj:'CTA final. Mostrar que o processo é simples, claro e sem surpresa.',
+   prox:'Bônus: Copa quente (SEG 06/07)',
+   ideia:'Arte com 4 passos numerados e ilustrados: 1. Você chega / 2. A gente ouve / 3. Diagnóstico e orçamento / 4. Você leva funcionando. Fundo escuro, numeração grande, ItapuaCell no rodapé.',
+   copy:'Como funciona na ItapuaCell:\n\n① Você chega com o equipamento\n② A gente ouve o problema com atenção\n③ Fazemos o diagnóstico antes de qualquer coisa\n④ Você aprova o orçamento — custo claro, sem surpresa\n⑤ Serviço feito. Equipamento testado.\n⑥ Você vai embora com o problema resolvido.\n\nSimples assim.',
+   legenda:'Na ItapuaCell o processo é simples e transparente: diagnóstico antes de tudo, orçamento aprovado por você, e o equipamento só sai quando tudo está funcionando. Tem dúvida? Chama no WhatsApp — sem compromisso.'},
+
+  /* ══════ SEMANA 5 — Bônus + Copa ══════ */
+  // SEG 06/JUL → Reels
+  {week:5,dow:'SEG',d:'06',m:'JUL',tipo:'Reels',cat:'bastidor',redirect:true,
+   title:'Computador que não liga — do diagnóstico à solução',
+   hook:'Situação de urgência máxima. "Já passei por isso."',
+   obj:'Mostrar diagnóstico de ponta a ponta para o problema mais assustador.',
+   prox:'Formatação e recuperação (TER 07/07)',
+   cenas:[
+     {visual:'Computador na bancada, não responde ao botão power',fala:'"Computador não liga. O que está acontecendo?"',dica:'Mostrar o botão sendo pressionado sem resposta. Gera empatia.'},
+     {visual:'Técnico da ItapuaCell abrindo o gabinete com multímetro',fala:'"Primeiro passo: identificar a causa com precisão."',dica:'Mostrar o técnico testando fonte, memória e conexões.'},
+     {visual:'Problema sendo identificado e corrigido',fala:'"Problema encontrado. Solução aplicada."',dica:'Mostrar a peça ou conexão problemática de perto.'},
+     {visual:'Computador ligando, sistema carregando',fala:'"Diagnóstico correto evita trocar peças desnecessárias. ItapuaCell."',dica:'Tela acendendo como desfecho satisfatório.'}
+   ]},
+
+  // TER 07/JUL → Feed
+  {week:5,dow:'TER',d:'07',m:'JUL',tipo:'Feed',cat:'bastidor',redirect:true,
+   title:'Formatação e recuperação de desempenho — antes e depois',
+   hook:'Antes e depois de um computador lento que voltou a voar.',
+   obj:'Encerrar o eixo de lentidão com solução visual e prova real.',
+   prox:'Copa quente (QUA 08/07)',
+   ideia:'Arte dividida: lado esquerdo "Antes" (tela travada, ampulheta, vermelho) / lado direito "Depois" (barra de progresso cheia, verde, ItapuaCell). Números reais de performance se possível.',
+   copy:'Computador travando toda hora?\n\nO que a ItapuaCell faz:\n\n→ Diagnóstico completo (inclusive backup dos seus dados)\n→ Formatação limpa e instalação do zero\n→ Configuração completa do sistema\n→ Teste final de desempenho\n\nAntes: 60 segundos pra abrir\nDepois: menos de 10 segundos\n\nItapuaCell. Antes e depois que você sente.',
+   legenda:'Computador lento não significa computador morto. Na maioria dos casos, formatação + configuração correta transforma o desempenho completamente. A ItapuaCell cuida do backup primeiro e entrega o equipamento rodando como novo.'},
+
+  // QUA 08/JUL → SAZONAL: Copa quente
+  {week:5,dow:'QUA',d:'08',m:'JUL',tipo:'Reels',cat:'sazonal',sazonal:true,redirect:true,
+   title:'Copa quente — equipamento mais quente ainda',
+   hook:'Copa em andamento, mata-mata começando. Usuários com streaming no limite. Falar de sobrecarga é natural.',
+   obj:'Gerar identificação e conversão com público que está usando mais os equipamentos pela Copa.',
+   prox:'Por que seu celular esquenta mesmo sem usar muito? (QUI 09/07)',
+   cenas:[
+     {visual:'Termômetro subindo na tela com imagens do jogo',fala:'"Copa do Mundo em pleno mata-mata e seu notebook no limite..."',dica:'Imagens de jogo + overlay do termômetro. Visual impactante.'},
+     {visual:'Notebook esquentando — ventilador barulhento',fala:'"Esquentando mais que o normal? Travando no streaming?"',dica:'Som do ventilador barulhento é identificação imediata.'},
+     {visual:'Bateria do celular caindo rápido no jogo',fala:'"Bateria do celular sumindo antes do final?"',dica:'Gravar o celular descarregando na hora do jogo. Familiar.'},
+     {visual:'Técnico da ItapuaCell na bancada',fala:'"Uso intenso acelera o desgaste. Traz pra ItapuaCell antes do próximo jogo. ⚽"',dica:'CTA com urgência Copa. Tom amigável, não alarmista.'}
+   ],
+   legenda:'Copa do Mundo no mata-mata = notebook e celular no limite absoluto. 🔥⚽ Seu equipamento está sofrendo? Esquentando mais que o normal, travando no streaming, bateria sumindo rápido? Uso intenso acelera o desgaste. Traz pra ItapuaCell antes do próximo jogo. Curta cada partida sem perrengue!'},
+
+  /* ══════ JULHO COMPLETO — sem postagens aos domingos ══════ */
+  // QUI 09/JUL → Feed
+  {week:6,dow:'QUI',d:'09',m:'JUL',tipo:'Feed',cat:'edu',
+   title:'Por que seu celular esquenta mesmo sem usar muito?',
+   hook:'Aquecimento fora do normal pode indicar bateria cansada, apps em segundo plano ou falha interna.',
+   obj:'Educar o público sobre um problema comum e gerar procura por diagnóstico antes de virar defeito grave.',
+   prox:'Bastidor: teste de bateria (SEX 10/07)',
+   ideia:'Arte em checklist com o título “Seu celular está esquentando do nada?” e 5 possíveis causas. Usar destaque visual em vermelho/laranja para calor e CTA em verde para avaliação.',
+   copy:'Seu celular esquenta mesmo parado?\n\nIsso pode acontecer por:\n→ Bateria desgastada\n→ Aplicativos rodando em segundo plano\n→ Carregador inadequado\n→ Sistema sobrecarregado\n→ Defeito interno começando\n\nEsquentar demais não é normal. Antes de piorar, faça uma avaliação técnica na ItapuaCell.',
+   legenda:'Celular esquentando sem motivo aparente merece atenção. Às vezes é só ajuste no sistema, mas também pode ser sinal de bateria ou componente com problema. A ItapuaCell avalia antes de qualquer troca e te orienta com clareza.'},
+
+  // SEX 10/JUL → Reels
+  {week:6,dow:'SEX',d:'10',m:'JUL',tipo:'Reels',cat:'bastidor',
+   title:'Bastidor: como testamos uma bateria viciada',
+   hook:'“Se sua bateria cai de 40% para 5% do nada, olha isso antes que ela te deixe na mão.”',
+   obj:'Mostrar processo técnico real e reforçar confiança no diagnóstico da ItapuaCell.',
+   prox:'Checklist antes de comprar carregador (SAB 11/07)',
+   cenas:[
+     {visual:'Celular na bancada com bateria descarregando rápido',fala:'“Se a bateria do seu celular despenca do nada, isso não é normal.”',dica:'Abrir com print ou gravação da porcentagem caindo. Gancho forte nos 3 primeiros segundos.'},
+     {visual:'Técnico conectando o aparelho em ferramenta/teste de carga',fala:'“Antes de trocar qualquer peça, a gente testa consumo, carregamento e resposta da bateria.”',dica:'Mostrar equipamento real e tela de teste para dar autoridade.'},
+     {visual:'Comparação entre bateria saudável e bateria com perda de desempenho',fala:'“Uma bateria ruim pode fazer o celular desligar, esquentar e carregar de forma instável.”',dica:'Usar texto curto na tela: desliga / esquenta / descarrega rápido.'},
+     {visual:'Celular funcionando após avaliação',fala:'“Na ItapuaCell, diagnóstico vem antes da troca. Chama no WhatsApp e evita gastar à toa.”',dica:'Fechar com CTA direto e tom de orientação.'}
+   ],
+   legenda:'Bateria descarregando rápido não significa automaticamente troca. Primeiro vem o diagnóstico. A ItapuaCell testa o consumo, o carregamento e a condição real do aparelho antes de indicar qualquer serviço.'},
+
+  // SAB 11/JUL → Feed
+  {week:6,dow:'SAB',d:'11',m:'JUL',tipo:'Feed',cat:'auto',
+   title:'Antes de comprar carregador novo, veja isso',
+   hook:'Nem todo problema de carregamento está no carregador.',
+   obj:'Quebrar objeção e atrair clientes com falha de carga, conector sujo ou entrada danificada.',
+   prox:'3 sinais de que seu notebook vai te deixar na mão (SEG 13/07)',
+   ideia:'Arte com título “Não culpe o carregador antes disso” e divisão entre carregador, cabo, entrada e bateria. Visual simples e direto.',
+   copy:'Seu celular parou de carregar?\n\nAntes de comprar outro carregador, avalie:\n→ Cabo com mau contato\n→ Fonte fraca ou incompatível\n→ Entrada de carga suja\n→ Conector danificado\n→ Bateria com falha\n\nComprar peça sem diagnóstico pode ser dinheiro jogado fora. A ItapuaCell verifica primeiro.',
+   legenda:'Falha no carregamento pode ter várias causas. Às vezes o problema está no cabo, às vezes na entrada, às vezes na bateria. A avaliação técnica evita compra desnecessária e resolve o problema certo.'},
+
+  // SEG 13/JUL → Reels
+  {week:7,dow:'SEG',d:'13',m:'JUL',tipo:'Reels',cat:'edu',
+   title:'3 sinais de que seu notebook vai te deixar na mão',
+   hook:'“Se seu notebook faz qualquer uma dessas 3 coisas, ele está avisando que vai parar.”',
+   obj:'Criar urgência educativa para manutenção preventiva em notebooks.',
+   prox:'Manutenção preventiva: quanto custa adiar? (TER 14/07)',
+   cenas:[
+     {visual:'Notebook travando ao abrir programas simples',fala:'“Sinal 1: ele trava até para abrir coisa básica.”',dica:'Usar cena real de lentidão. Texto grande na tela.'},
+     {visual:'Ventoinha fazendo barulho e notebook quente',fala:'“Sinal 2: esquenta muito e parece que vai decolar.”',dica:'Gravar som do cooler ou simular com close na saída de ar.'},
+     {visual:'Tela azul/erro ou reinicialização',fala:'“Sinal 3: reinicia sozinho ou aparece erro do nada.”',dica:'Mostrar tela de erro sem expor dados pessoais.'},
+     {visual:'Técnico da ItapuaCell avaliando o notebook',fala:'“Esses sinais aparecem antes do prejuízo. Traz pra ItapuaCell e faz o diagnóstico.”',dica:'CTA preventivo: resolver antes de parar de vez.'}
+   ],
+   legenda:'Notebook raramente para do nada. Antes disso, ele costuma dar sinais: travamentos, aquecimento, barulho, erro e desligamentos. A manutenção preventiva evita prejuízo maior.'},
+
+  // TER 14/JUL → Feed
+  {week:7,dow:'TER',d:'14',m:'JUL',tipo:'Feed',cat:'auto',
+   title:'Manutenção preventiva: quanto custa adiar?',
+   hook:'Adiar manutenção pode transformar um serviço simples em troca de peça.',
+   obj:'Gerar consciência sobre prevenção e valor percebido do serviço técnico.',
+   prox:'Bastidor: organização da bancada (QUA 15/07)',
+   ideia:'Arte comparativa: “Resolver cedo” vs “Esperar quebrar”. Mostrar economia e risco de perda de dados.',
+   copy:'Adiar manutenção pode sair caro.\n\nQuando você resolve cedo:\n→ Evita superaquecimento\n→ Protege seus dados\n→ Aumenta a vida útil\n→ Reduz risco de troca de peça\n\nQuando espera quebrar:\n→ Pode perder arquivos\n→ Pode queimar componente\n→ Pode ficar sem trabalhar\n→ Pode gastar mais\n\nPrevenção também é economia.',
+   legenda:'Muita gente só procura assistência quando o equipamento para. O problema é que, nesse ponto, o conserto pode ser mais caro. Diagnóstico e manutenção preventiva ajudam a evitar prejuízo.'},
+
+  // QUA 15/JUL → Reels
+  {week:7,dow:'QUA',d:'15',m:'JUL',tipo:'Reels',cat:'bastidor',
+   title:'Bastidor: organização da bancada técnica',
+   hook:'“Você confiaria seu aparelho em uma bancada bagunçada? Olha como a gente trabalha.”',
+   obj:'Mostrar cuidado, método e profissionalismo da ItapuaCell através do ambiente de trabalho.',
+   prox:'Como proteger seus dados antes da manutenção (QUI 16/07)',
+   cenas:[
+     {visual:'Bancada limpa com ferramentas alinhadas',fala:'“Aqui, antes de abrir qualquer equipamento, a organização vem primeiro.”',dica:'Começar com plano bonito e organizado. Gancho visual forte.'},
+     {visual:'Separação de parafusos e peças pequenas',fala:'“Cada peça fica separada para evitar perda, troca ou montagem errada.”',dica:'Mostrar potes, manta magnética ou divisão por etapa.'},
+     {visual:'Técnico limpando área e preparando equipamento',fala:'“Isso parece detalhe, mas detalhe é o que evita retrabalho.”',dica:'Transmitir confiança e padrão de processo.'},
+     {visual:'Equipamento sendo fechado e testado',fala:'“Na ItapuaCell, cuidado técnico começa na bancada e termina no teste final.”',dica:'Fechar com logo ou equipamento funcionando.'}
+   ],
+   legenda:'Organização não é estética, é segurança no processo. Cada equipamento que chega na ItapuaCell passa por uma rotina cuidadosa para reduzir riscos e garantir um serviço bem feito.'},
+
+  // QUI 16/JUL → Feed
+  {week:7,dow:'QUI',d:'16',m:'JUL',tipo:'Feed',cat:'edu',
+   title:'Como proteger seus dados antes da manutenção',
+   hook:'Antes de qualquer serviço, backup e cuidado com dados precisam ser prioridade.',
+   obj:'Gerar confiança e reduzir medo de perder fotos, documentos e arquivos importantes.',
+   prox:'Prova real: problema simples que parecia grave (SEX 17/07)',
+   ideia:'Arte com checklist “Antes de levar para assistência”. Ícones de fotos, documentos, WhatsApp e nuvem.',
+   copy:'Antes de levar seu aparelho para manutenção:\n\n✅ Faça backup das fotos\n✅ Salve documentos importantes\n✅ Confira sua conta Google/iCloud\n✅ Avise se existem arquivos essenciais\n✅ Tire dúvidas antes do serviço\n\nNa ItapuaCell, seus dados são tratados com cuidado e transparência.',
+   legenda:'Dados pessoais são importantes. Por isso, antes de qualquer manutenção, vale conferir backups e avisar o técnico sobre arquivos essenciais. A ItapuaCell orienta e trabalha com transparência.'},
+
+  // SEX 17/JUL → Reels
+  {week:7,dow:'SEX',d:'17',m:'JUL',tipo:'Reels',cat:'conv',
+   title:'Prova real: problema simples que parecia grave',
+   hook:'“Esse cliente achou que ia perder o aparelho, mas o problema era muito mais simples.”',
+   obj:'Converter mostrando que diagnóstico evita gasto desnecessário.',
+   prox:'O que você ganha com diagnóstico antes do orçamento (SAB 18/07)',
+   cenas:[
+     {visual:'Cliente/equipamento chegando com problema aparente',fala:'“Chegou aqui parecendo caso perdido.”',dica:'Criar curiosidade nos 3 primeiros segundos sem expor cliente.'},
+     {visual:'Técnico abrindo e fazendo teste básico',fala:'“Mas antes de falar em troca, a gente fez o diagnóstico completo.”',dica:'Mostrar multímetro, teste de cabo, tela ou componente.'},
+     {visual:'Problema identificado como conexão, sujeira ou configuração',fala:'“No fim, era um problema simples que parecia enorme.”',dica:'Mostrar a solução visualmente, com texto “sem troca desnecessária”.'},
+     {visual:'Equipamento funcionando',fala:'“Diagnóstico correto economiza tempo e dinheiro. Chama a ItapuaCell.”',dica:'Final com CTA forte para WhatsApp.'}
+   ],
+   legenda:'Nem todo problema grave exige troca cara. Muitas vezes, o diagnóstico correto mostra uma solução mais simples. Na ItapuaCell, primeiro a gente entende o problema. Depois orienta o melhor caminho.'},
+
+  // SAB 18/JUL → Feed
+  {week:7,dow:'SAB',d:'18',m:'JUL',tipo:'Feed',cat:'conv',
+   title:'O que você ganha com diagnóstico antes do orçamento',
+   hook:'Orçamento sem diagnóstico pode gerar troca errada e gasto desnecessário.',
+   obj:'Reforçar o diferencial de transparência e incentivar contato no WhatsApp.',
+   prox:'O erro que estraga muita tela de celular (SEG 20/07)',
+   ideia:'Arte com 4 benefícios do diagnóstico: clareza, segurança, economia e transparência.',
+   copy:'Diagnóstico antes do orçamento significa:\n\n→ Saber a causa real do problema\n→ Evitar troca de peça desnecessária\n→ Ter noção clara do custo\n→ Decidir com segurança\n→ Resolver com transparência\n\nNa ItapuaCell, você entende antes de aprovar.',
+   legenda:'Um bom diagnóstico evita achismo. Antes de qualquer orçamento, a ItapuaCell identifica a causa do problema e explica o que precisa ser feito. Transparência do início ao fim.'},
+
+  // SEG 20/JUL → Reels
+  {week:8,dow:'SEG',d:'20',m:'JUL',tipo:'Reels',cat:'edu',
+   title:'O erro que estraga muita tela de celular',
+   hook:'“Esse hábito parece inofensivo, mas pode acabar com a tela do seu celular.”',
+   obj:'Educar sobre mau uso e gerar procura para troca/avaliação de tela.',
+   prox:'Película, capa e cuidado: o que realmente protege? (TER 21/07)',
+   cenas:[
+     {visual:'Celular sendo colocado no bolso com chave/moeda',fala:'“Guardar celular junto com chave é pedir risco na tela.”',dica:'Cena cotidiana, fácil de reproduzir e forte para identificação.'},
+     {visual:'Close em micro-riscos ou tela trincada',fala:'“Pequenos riscos viram trincos. Trincos viram toque falhando.”',dica:'Usar macro/close e texto na tela.'},
+     {visual:'Técnico avaliando touch e vidro',fala:'“Quando o dano chega no touch, o problema deixa de ser só estético.”',dica:'Explicar sem assustar demais, com tom educativo.'},
+     {visual:'Celular com proteção correta',fala:'“Proteção certa e avaliação rápida evitam prejuízo maior. ItapuaCell.”',dica:'Final com CTA para avaliação.'}
+   ],
+   legenda:'Tela trincada não é só questão estética. Dependendo do dano, o touch pode começar a falhar e o problema pode piorar. Cuide da proteção e procure avaliação se notar qualquer alteração.'},
+
+  // TER 21/JUL → Feed
+  {week:8,dow:'TER',d:'21',m:'JUL',tipo:'Feed',cat:'edu',
+   title:'Película, capa e cuidado: o que realmente protege?',
+   hook:'Proteção errada dá falsa sensação de segurança.',
+   obj:'Educar o cliente e reforçar autoridade em cuidado preventivo para celular.',
+   prox:'Bastidor: teste final antes da entrega (QUA 22/07)',
+   ideia:'Arte com 3 blocos: película, capa e hábito de uso. Mostrar o que ajuda e o que não resolve sozinho.',
+   copy:'O que protege seu celular de verdade?\n\nPelícula ajuda, mas não faz milagre.\nCapa ajuda, mas precisa proteger bordas.\nCarregar no bolso com chave continua sendo risco.\nQueda forte pode danificar mesmo com proteção.\n\nProteção é conjunto: acessório certo + cuidado diário.',
+   legenda:'Película e capa ajudam, mas não substituem cuidado. Proteção real é a soma de bons acessórios, hábitos corretos e manutenção quando o aparelho começa a apresentar sinais.'},
+
+  // QUA 22/JUL → Reels
+  {week:8,dow:'QUA',d:'22',m:'JUL',tipo:'Reels',cat:'bastidor',
+   title:'Bastidor: teste final antes da entrega',
+   hook:'“O aparelho não sai da bancada só porque ligou. Antes, ele passa por isso aqui.”',
+   obj:'Mostrar padrão de qualidade e reduzir medo do cliente sobre serviço mal feito.',
+   prox:'Como saber se vale consertar ou trocar? (QUI 23/07)',
+   cenas:[
+     {visual:'Equipamento funcionando após manutenção',fala:'“Ligou? Ótimo. Mas ainda não acabou.”',dica:'Gancho bom porque quebra expectativa.'},
+     {visual:'Teste de tela, touch, câmera, som ou teclado',fala:'“A gente confere funções principais antes de entregar.”',dica:'Mostrar testes rápidos em sequência.'},
+     {visual:'Técnico verificando carregamento e desempenho',fala:'“Carregamento, resposta, aquecimento e estabilidade também entram no teste.”',dica:'Mostrar processo com cortes dinâmicos.'},
+     {visual:'Equipamento pronto para entrega',fala:'“Na ItapuaCell, entregar funcionando é obrigação. Entregar testado é padrão.”',dica:'Fechar com frase forte e logo.'}
+   ],
+   legenda:'Antes de entregar, a ItapuaCell testa o equipamento. O objetivo é garantir que o problema foi resolvido e que o cliente receba o aparelho funcionando com segurança.'},
+
+  // QUI 23/JUL → Feed
+  {week:8,dow:'QUI',d:'23',m:'JUL',tipo:'Feed',cat:'auto',
+   title:'Como saber se vale consertar ou trocar?',
+   hook:'A resposta depende do custo, do estado do aparelho e do uso que você faz dele.',
+   obj:'Ajudar o cliente na decisão e posicionar a ItapuaCell como consultiva, não só reparadora.',
+   prox:'Notebook desligando sozinho: principais causas (SEX 24/07)',
+   ideia:'Arte estilo decisão: “Consertar” quando custo é baixo e aparelho atende; “Trocar” quando dano é recorrente e custo não compensa.',
+   copy:'Vale consertar ou trocar?\n\nConsertar pode valer quando:\n→ O aparelho ainda atende sua rotina\n→ O custo é menor que comprar outro\n→ O defeito é pontual\n→ Dá para melhorar com upgrade/manutenção\n\nTrocar pode fazer sentido quando:\n→ O custo do reparo é muito alto\n→ O aparelho já não atende mais\n→ Os problemas são recorrentes\n\nNa dúvida, diagnóstico primeiro.',
+   legenda:'Nem sempre trocar é a melhor opção. E nem sempre consertar compensa. A ItapuaCell avalia o estado real do equipamento e ajuda você a tomar uma decisão mais segura.'},
+
+  // SEX 24/JUL → Reels
+  {week:8,dow:'SEX',d:'24',m:'JUL',tipo:'Reels',cat:'auto',
+   title:'Notebook desligando sozinho: principais causas',
+   hook:'“Se seu notebook desliga sozinho, pare de ignorar. Isso pode virar prejuízo.”',
+   obj:'Gerar procura imediata para diagnóstico de notebook com falha crítica.',
+   prox:'5 cuidados para aumentar a vida útil do seu equipamento (SAB 25/07)',
+   cenas:[
+     {visual:'Notebook apagando durante uso',fala:'“Notebook desligando sozinho não é frescura do sistema.”',dica:'Cena de interrupção no meio do trabalho/estudo.'},
+     {visual:'Técnico mostrando ventilação e temperatura',fala:'“A causa pode ser superaquecimento, bateria, fonte ou placa.”',dica:'Listar causas na tela com cortes rápidos.'},
+     {visual:'Diagnóstico na bancada',fala:'“O perigo é continuar usando até o problema piorar.”',dica:'Tom de alerta, sem exagero técnico.'},
+     {visual:'Notebook estabilizado após teste',fala:'“Traz pra ItapuaCell. Diagnóstico certo evita troca errada.”',dica:'CTA direto para WhatsApp.'}
+   ],
+   legenda:'Notebook desligando sozinho precisa de avaliação. Pode ser aquecimento, bateria, fonte ou outro componente. Quanto antes identificar, menor o risco de prejuízo maior.'},
+
+  // SAB 25/JUL → Feed
+  {week:8,dow:'SAB',d:'25',m:'JUL',tipo:'Feed',cat:'edu',
+   title:'5 cuidados para aumentar a vida útil do seu equipamento',
+   hook:'Pequenos hábitos evitam grandes problemas.',
+   obj:'Conteúdo salvável para educar, gerar autoridade e manter a marca presente.',
+   prox:'Última semana: diagnóstico gratuito como porta de entrada (SEG 27/07)',
+   ideia:'Arte em checklist com 5 cuidados: limpeza, ventilação, carregador correto, backup e manutenção preventiva.',
+   copy:'5 cuidados simples que aumentam a vida útil:\n\n1. Não use notebook em cima da cama\n2. Evite carregador paralelo sem procedência\n3. Faça backup dos seus dados\n4. Não ignore aquecimento e travamentos\n5. Faça manutenção preventiva\n\nCuidar antes é sempre mais barato que consertar depois.',
+   legenda:'Equipamento bem cuidado dura mais, dá menos problema e evita gastos desnecessários. Salve esse checklist e procure a ItapuaCell se algum sinal começar a aparecer.'},
+
+  // SEG 27/JUL → Reels
+  {week:9,dow:'SEG',d:'27',m:'JUL',tipo:'Reels',cat:'conv',
+   title:'Diagnóstico gratuito como porta de entrada',
+   hook:'“Antes de gastar dinheiro com peça, faz isso aqui primeiro.”',
+   obj:'Converter público indeciso para contato no WhatsApp e visita à assistência.',
+   prox:'Checklist: o que levar junto com o aparelho (TER 28/07)',
+   cenas:[
+     {visual:'Pessoa preocupada olhando celular/notebook com problema',fala:'“Você não precisa adivinhar o defeito do seu aparelho.”',dica:'Gancho forte para quem está inseguro.'},
+     {visual:'Técnico recebendo o equipamento',fala:'“Na ItapuaCell, primeiro a gente escuta o problema e avalia.”',dica:'Mostrar atendimento humano.'},
+     {visual:'Diagnóstico sendo feito',fala:'“Depois você entende a causa, o caminho e o orçamento antes de aprovar.”',dica:'Mostrar transparência do processo.'},
+     {visual:'WhatsApp/CTA na tela',fala:'“Chama agora e pede sua avaliação. Sem achismo.”',dica:'Encerrar com WhatsApp bem visível.'}
+   ],
+   legenda:'Antes de comprar peça, trocar aparelho ou tentar resolver sozinho, faça uma avaliação. A ItapuaCell identifica o problema e te orienta com transparência.'},
+
+  // TER 28/JUL → Feed
+  {week:9,dow:'TER',d:'28',m:'JUL',tipo:'Feed',cat:'edu',
+   title:'Checklist: o que levar junto com o aparelho',
+   hook:'Levar os acessórios certos acelera o diagnóstico.',
+   obj:'Organizar o atendimento e reduzir idas e voltas do cliente.',
+   prox:'Bastidor: atendimento transparente no balcão (QUA 29/07)',
+   ideia:'Arte em checklist “Vai levar para assistência? Leve isso também”. Visual limpo e útil.',
+   copy:'Vai levar seu equipamento para avaliação?\n\nLeve, se possível:\n→ Carregador original\n→ Cabo usado no dia a dia\n→ Senha de desbloqueio, se necessário\n→ Informações sobre quando o problema começou\n→ Acessórios relacionados ao defeito\n\nIsso ajuda a encontrar a causa mais rápido.',
+   legenda:'Quanto mais informações chegam junto com o aparelho, mais rápido o diagnóstico acontece. Levar carregador, cabo e explicar quando o problema começou ajuda muito no atendimento.'},
+
+  // QUA 29/JUL → Reels
+  {week:9,dow:'QUA',d:'29',m:'JUL',tipo:'Reels',cat:'bastidor',
+   title:'Bastidor: atendimento transparente no balcão',
+   hook:'“Aqui o cliente não fica no escuro. Ele entende o que vai ser feito.”',
+   obj:'Humanizar a marca e mostrar transparência no atendimento.',
+   prox:'Fechamento do mês: melhores cuidados aprendidos (QUI 30/07)',
+   cenas:[
+     {visual:'Atendimento recebendo o cliente e ouvindo o problema',fala:'“O primeiro passo é ouvir o que aconteceu.”',dica:'Mostrar conversa natural, sem expor dados ou rosto se não autorizado.'},
+     {visual:'Técnico explicando possibilidades de causa',fala:'“Depois explicamos as possibilidades sem prometer o que ainda não foi testado.”',dica:'Reforçar honestidade e cuidado.'},
+     {visual:'Registro do equipamento ou checklist interno',fala:'“Tudo é registrado para manter organização e clareza.”',dica:'Mostrar ficha, etiqueta ou processo interno.'},
+     {visual:'Cliente recebendo orientação',fala:'“Transparência é parte do serviço. ItapuaCell.”',dica:'Fechar com frase institucional.'}
+   ],
+   legenda:'Atendimento transparente faz diferença. Na ItapuaCell, o cliente entende o processo, recebe orientação e só aprova depois de saber o caminho indicado.'},
+
+  // QUI 30/JUL → Feed
+  {week:9,dow:'QUI',d:'30',m:'JUL',tipo:'Feed',cat:'conv',
+   title:'Fechamento do mês: melhores cuidados aprendidos',
+   hook:'Resumo útil para salvar e compartilhar.',
+   obj:'Encerrar o mês reforçando autoridade e incentivando diagnóstico para quem identificou algum sinal.',
+   prox:'Reels final: seu equipamento pediu socorro este mês? (SEX 31/07)',
+   ideia:'Arte carrossel/estático com resumo dos principais aprendizados: bateria, tela, superaquecimento, backup e diagnóstico.',
+   copy:'Resumo do mês na ItapuaCell:\n\n→ Celular esquentando precisa de atenção\n→ Bateria ruim dá sinais antes de parar\n→ Notebook lento pode melhorar com manutenção\n→ Backup protege seus dados\n→ Diagnóstico evita gasto errado\n\nPercebeu algum desses sinais? Chama a ItapuaCell.',
+   legenda:'Durante o mês, mostramos vários sinais que indicam quando o equipamento precisa de atenção. Se você identificou algum deles no seu celular, notebook ou computador, chama a ItapuaCell para avaliar.'},
+
+  // SEX 31/JUL → Reels
+  {week:9,dow:'SEX',d:'31',m:'JUL',tipo:'Reels',cat:'conv',
+   title:'Seu equipamento pediu socorro este mês?',
+   hook:'“Se em julho seu celular ou notebook fez isso, agosto não pode começar com o mesmo problema.”',
+   obj:'Fechar julho com chamada forte para conversão e abertura de demanda para agosto.',
+   prox:'Planejamento de agosto',
+   cenas:[
+     {visual:'Montagem rápida de problemas: travando, esquentando, tela quebrada, bateria fraca',fala:'“Se em julho seu equipamento travou, esquentou ou falhou...”',dica:'Cortes rápidos com problemas comuns dos posts do mês.'},
+     {visual:'Técnico na bancada com ferramentas',fala:'“Ele não está só incomodando. Ele está pedindo manutenção.”',dica:'Tom forte, com texto na tela: “não ignore”.'},
+     {visual:'Antes e depois de aparelho funcionando',fala:'“Quanto antes você avalia, menor a chance de virar prejuízo.”',dica:'Usar prova visual ou equipamento ligando.'},
+     {visual:'CTA com WhatsApp da ItapuaCell',fala:'“Comece agosto com seu equipamento funcionando. Chama a ItapuaCell agora.”',dica:'Fechar com CTA direto e número/link.'}
+   ],
+   legenda:'Julho terminou, mas o problema do seu equipamento não precisa continuar em agosto. Se seu celular, notebook ou computador está travando, esquentando, descarregando rápido ou falhando, chama a ItapuaCell e faça uma avaliação.'}
+];
+
+
+const weekThemes = {1:'Apresentação — quem somos',2:'Celular — problemas e soluções',3:'Notebook — aprofundamento e autoridade',4:'Conversão — fechar o ciclo',5:'Bônus — Copa no mata-mata'};
+const catInfo = {edu:['Educativo','cat-edu'],bastidor:['Bastidor','cat-bastidor'],auto:['Autoridade','cat-auto'],conv:['Conversão','cat-conv'],sazonal:['Sazonal','cat-sazonal']};
+const statuses = ['Ideia aprovada','Roteiro','Design/Gravação','Revisão interna','Aguardando cliente','Agendado','Publicado'];
+const statusKey='itapuacell_v2_status_funcional'; const metricKey='itapuacell_v2_metricas';
+let state = JSON.parse(localStorage.getItem(statusKey)||'{}'); let metrics = JSON.parse(localStorage.getItem(metricKey)||'{}'); let currentPost=0;
+posts.forEach((p,i)=>{p.id='post-'+i;p.date=toDate(p);p.funil=defineFunil(p);p.prioridade=p.sazonal?'Alta':(p.cat==='conv'||p.cat==='auto'?'Média':'Normal');p.responsavel=p.tipo==='Reels'?'Roteiro/Gravação':'Design/Copy'; if(!state[p.id]) state[p.id]=i<2?'Ideia aprovada':'Ideia aprovada';}); saveState();
+function saveState(){localStorage.setItem(statusKey,JSON.stringify(state));} function saveMetrics(){localStorage.setItem(metricKey,JSON.stringify(metrics));}
+function toDate(p){const mm={JUN:5,JUL:6}[p.m]; return new Date(2026,mm,Number(p.d));}
+function defineFunil(p){if(p.cat==='conv')return 'Fundo de funil'; if(p.cat==='auto'||p.cat==='bastidor')return 'Meio de funil'; if(p.cat==='sazonal')return 'Oportunidade'; return 'Topo de funil';}
+function tipoClass(p){return p.tipo==='Reels'?'reels':'feed'} function catLabel(p){return catInfo[p.cat]?.[0]||p.cat} function catClass(p){return catInfo[p.cat]?.[1]||''}
+function fullText(p){let s=[p.title,p.hook,p.obj,p.prox,p.ideia,p.copy,p.legenda].filter(Boolean).join(' '); if(p.cenas) s += ' '+p.cenas.map(c=>[c.visual,c.fala,c.dica].join(' ')).join(' '); return s.toLowerCase();}
+function matches(p){const q=(document.getElementById('search')?.value||'').toLowerCase(); const fc=document.getElementById('filterCat')?.value||'all'; const fs=document.getElementById('filterStatus')?.value||'all'; return (!q||fullText(p).includes(q))&&(fc==='all'||p.cat===fc)&&(fs==='all'||state[p.id]===fs);}
+function tabsInit(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>goTab(b.dataset.tab));document.querySelectorAll('[data-tab-go]').forEach(b=>b.onclick=()=>goTab(b.dataset.tabGo));} function goTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id)); if(id==='kanban')renderKanban(); if(id==='cliente')renderClient(); if(id==='metricas')renderMetricas(); window.scrollTo({top:0,behavior:'smooth'})}
+function initFilters(){const f=document.getElementById('filterCat'); Object.entries(catInfo).forEach(([k,v])=>f.insertAdjacentHTML('beforeend',`<option value="${k}">${v[0]}</option>`)); const fs=document.getElementById('filterStatus'); statuses.forEach(s=>fs.insertAdjacentHTML('beforeend',`<option>${s}</option>`)); ['search','filterCat','filterStatus','filterMonth'].forEach(id=>document.getElementById(id).addEventListener('input',renderCalendar));}
+function renderKpis(){let total=posts.length, reels=posts.filter(p=>p.tipo==='Reels').length, feed=posts.filter(p=>p.tipo==='Feed').length, pub=posts.filter(p=>state[p.id]==='Publicado').length, saz=posts.filter(p=>p.sazonal).length, aguard=posts.filter(p=>state[p.id]==='Aguardando cliente').length; const arr=[['Posts',total,'planejados'],['Reels',reels,'prioridade de alcance'],['Feeds',feed,'apoio visual'],['Sazonais',saz,'oportunidades'],['Publicados',pub,Math.round(pub/total*100)+'% concluído'],['Cliente',aguard,'aguardando aprovação']]; document.getElementById('kpis').innerHTML=arr.map(x=>`<div class="kpi"><small>${x[0]}</small><strong>${x[1]}</strong><span>${x[2]}</span></div>`).join('');}
+function postCard(p,i){return `<article class="post-card" id="card-${p.id}"><div class="datebox"><div><span>${p.dow}</span><b>${p.d}</b><span>${p.m}</span></div></div><div><div class="post-meta"><span class="pill ${tipoClass(p)}">${p.tipo}</span><span class="pill ${catClass(p)}">${catLabel(p)}</span><span class="pill">${p.funil}</span><span class="pill">${state[p.id]}</span></div><h3 class="post-title">${p.title}</h3><p class="hook">${p.hook}</p><div class="card-actions-row"><button class="mini dark" data-open="${i}">Abrir roteiro</button><button class="mini" data-copy="brief" data-index="${i}">Copiar briefing</button><button class="mini" data-copy="roteiro" data-index="${i}">Copiar roteiro/copy</button><button class="mini ok" data-copy="cliente" data-index="${i}">Mensagem cliente</button><select class="status-select" data-status="${i}">${statuses.map(s=>`<option ${state[p.id]===s?'selected':''}>${s}</option>`).join('')}</select></div></div></article>`}
+function attachDynamic(){document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openDrawer(+b.dataset.open));document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyPost(+b.dataset.index,b.dataset.copy));document.querySelectorAll('[data-status]').forEach(s=>s.onchange=()=>{state[posts[+s.dataset.status].id]=s.value;saveState();renderAllSoft();})}
+function renderDashboard(){renderKpis(); document.getElementById('nextPosts').innerHTML=posts.slice(0,6).map(postCard).join(''); let funils={};posts.forEach(p=>funils[p.funil]=(funils[p.funil]||0)+1); let sts={};posts.forEach(p=>sts[state[p.id]]=(sts[state[p.id]]||0)+1); document.getElementById('strategySummary').innerHTML=`<div class="box"><b>Distribuição por funil</b>
+${Object.entries(funils).map(([k,v])=>`• ${k}: ${v} posts`).join('\n')}
+
+<b>Status de produção</b>
+${statuses.map(s=>`• ${s}: ${sts[s]||0}`).join('\n')}
+
+<b>Alerta operacional</b>
+${posts.filter(p=>state[p.id]!=='Publicado').length} posts ainda precisam passar pelo fluxo até publicação.</div>`; attachDynamic();}
+function renderCalendar(){const container=document.getElementById('calendarMonths'); const selected=Number(document.getElementById('filterMonth')?.value||5); container.innerHTML=monthHtml(2026,selected); attachDynamic();}
+function monthHtml(year,month){const name=month===5?'Junho 2026':'Julho 2026'; const first=new Date(year,month,1); const last=new Date(year,month+1,0).getDate(); const start=first.getDay(); let cells=''; ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>cells+=`<div class="dow">${d}</div>`); for(let i=0;i<start;i++)cells+='<div class="day empty"></div>'; for(let d=1;d<=last;d++){const dayPosts=posts.filter(p=>p.date.getMonth()===month&&p.date.getDate()===d&&matches(p)); cells+=`<div class="day"><div class="day-num">${String(d).padStart(2,'0')}</div>${dayPosts.map(p=>`<button class="event ${catClass(p)}" data-open="${posts.indexOf(p)}">${p.title}<small>${p.tipo} · ${state[p.id]}</small></button>`).join('')}</div>`;} return `<div class="month"><h3>${name}</h3><div class="cal-grid">${cells}</div></div>`}
+function renderKanban(){document.getElementById('kanbanBoard').innerHTML=statuses.map(s=>`<section class="col"><h3>${s} <span>${posts.filter(p=>state[p.id]===s).length}</span></h3><div class="col-body">${posts.filter(p=>state[p.id]===s).map((p)=>`<div class="kan-card"><div class="post-meta"><span class="pill ${tipoClass(p)}">${p.tipo}</span><span class="pill ${catClass(p)}">${catLabel(p)}</span></div><b>${p.d}/${p.m} — ${p.title}</b><p>${p.obj}</p><div class="card-actions-row"><button class="mini dark" data-open="${posts.indexOf(p)}">Abrir</button><select class="status-select" data-status="${posts.indexOf(p)}">${statuses.map(x=>`<option ${state[p.id]===x?'selected':''}>${x}</option>`).join('')}</select></div></div>`).join('')}</div></section>`).join(''); attachDynamic();}
+function renderLibrary(){
+  const ganchos=[
+    'Você pode estar destruindo seu celular sem perceber.',
+    'Se seu notebook faz isso, pare de ignorar agora.',
+    'O erro que faz muita gente gastar dinheiro à toa.',
+    'Antes de trocar seu aparelho, veja isso.',
+    'Seu equipamento está pedindo socorro e você não percebeu.',
+    'Pare tudo: esse sinal no seu celular pode virar prejuízo.',
+    'Seu notebook não está lento à toa — olha o que pode estar acontecendo.',
+    'Isso aqui faz muita gente comprar aparelho novo sem precisar.',
+    'Se seu celular esquenta assim, tem algo errado.',
+    'O problema não é só a tela quebrada — pode piorar rápido.',
+    'Você está adiando um conserto que pode sair mais caro depois.',
+    'Esse barulho no notebook não é normal.',
+    'Se o carregador só funciona em uma posição, atenção.',
+    'O maior erro depois que o celular cai na água é esse.',
+    'Seu computador pode estar lento por um motivo simples de resolver.',
+    'Antes de gastar com um novo, veja esse diagnóstico.',
+    'Esse detalhe na manutenção separa serviço profissional de gambiarra.',
+    'O que ninguém te conta sobre bateria viciada.',
+    'Seu aparelho dá sinais antes de parar de vez.',
+    'Se isso acontecer no dia do jogo, você vai se arrepender de não ter arrumado antes.'
+  ];
+  const ctas=[
+    'Chama no WhatsApp e peça uma avaliação.',
+    'Antes de trocar, faça um diagnóstico.',
+    'Seu equipamento está dando sinais? Fala com a ItapuaCell.',
+    'Não espera piorar: manda mensagem agora.',
+    'Quer saber se vale consertar? Chama a gente.',
+    'Traz na ItapuaCell e descubra o problema real.',
+    'Manda uma foto ou vídeo do problema no WhatsApp.',
+    'Clique no link da bio e fale com nossa equipe.',
+    'Agende sua avaliação antes que o problema aumente.',
+    'Seu aparelho ainda pode ter solução. Fala com a gente.',
+    'Evite trocar peça sem necessidade. Peça diagnóstico primeiro.',
+    'Chama agora e veja a melhor solução para seu caso.',
+    'Salve esse post e envie para quem está com esse problema.',
+    'Compartilhe com alguém que vive reclamando do celular.',
+    'Fale com a ItapuaCell e resolva com transparência.',
+    'Não fique no achismo. Diagnóstico primeiro, decisão depois.'
+  ];
+  const modelos=[
+    'Problema → causa → bastidor → solução → CTA',
+    'Mito → verdade → prova → chamada',
+    'Antes → diagnóstico → processo → depois',
+    'Dor urgente → risco → solução rápida → WhatsApp',
+    'Gancho exagerado → identificação → explicação simples → prova visual → CTA',
+    'Erro comum → consequência → jeito certo → autoridade → chamada',
+    'Cena cotidiana → problema aparece → técnico explica → solução aplicada → resultado',
+    'Pergunta direta → resposta técnica simples → bastidor → orientação final',
+    'Data sazonal → problema provável → urgência → solução antes do evento',
+    'Objeção do cliente → quebra da objeção → processo transparente → CTA',
+    'Comparativo trocar x consertar → economia → avaliação técnica → CTA',
+    'Checklist rápido → o que fazer → o que não fazer → chamar assistência',
+    'Prova real → diagnóstico → execução → teste final → entrega',
+    'Top 3 sinais → explicação curta → risco de ignorar → avaliação',
+    'História de cliente → problema inicial → solução → aprendizado',
+    'Bastidor técnico → detalhe do processo → por que importa → confiança',
+    'Alerta → causa invisível → solução preventiva → economia',
+    'Copa/feriado/evento → uso intenso → aparelho no limite → chamada urgente'
+  ];
+  document.getElementById('library').innerHTML=[['Ganchos fortes',ganchos],['CTAs',ctas],['Modelos de roteiro',modelos]].map(([t,items])=>`<div class="lib-box"><h3>${t}</h3><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
+}
+function renderClient(){document.getElementById('clientList').innerHTML=posts.map((p,i)=>`<article class="client-card"><div class="post-meta"><span class="pill">${p.dow} ${p.d}/${p.m}</span><span class="pill ${tipoClass(p)}">${p.tipo}</span><span class="pill ${catClass(p)}">${catLabel(p)}</span></div><h3>${p.title}</h3><p>${p.obj}</p><div class="card-actions-row"><button class="mini dark" data-open="${i}">Ver detalhes</button><button class="mini ok" data-copy="cliente" data-index="${i}">Copiar aprovação</button><select class="status-select" data-status="${i}">${statuses.map(s=>`<option ${state[p.id]===s?'selected':''}>${s}</option>`).join('')}</select></div></article>`).join(''); attachDynamic();}
+function renderMetricas(){const sel=document.getElementById('metricPost'); if(!sel.dataset.ready){sel.innerHTML=posts.map((p,i)=>`<option value="${i}">${p.d}/${p.m} — ${p.title}</option>`).join(''); sel.onchange=()=>{currentPost=+sel.value; metricForm();}; sel.dataset.ready=1;} metricForm();}
+function metricForm(){const p=posts[currentPost]; const m=metrics[p.id]||{}; document.getElementById('metricEditor').innerHTML=`<div class="box" style="margin-bottom:14px"><b>${p.title}</b>
+${p.dow} ${p.d}/${p.m} · ${p.tipo} · ${catLabel(p)}</div><div class="metrics-form">${['alcance','curtidas','comentarios','compartilhamentos','salvamentos','whatsapp','clientes'].map(k=>`<label>${k}<input type="number" min="0" value="${m[k]||''}" data-metric="${k}"></label>`).join('')}<label>Observação<textarea data-metric="obs">${m.obs||''}</textarea></label></div><br><button class="btn primary" data-action="save-metrics">Salvar métricas</button>`; document.querySelector('[data-action="save-metrics"]').onclick=()=>{let obj={};document.querySelectorAll('[data-metric]').forEach(x=>obj[x.dataset.metric]=x.value);metrics[p.id]=obj;saveMetrics();toast('Métricas salvas!');}}
+function openDrawer(i){const p=posts[i]; document.getElementById('drawerPills').innerHTML=`<span class="pill">${p.dow} ${p.d}/${p.m}</span><span class="pill ${tipoClass(p)}">${p.tipo}</span><span class="pill ${catClass(p)}">${catLabel(p)}</span><span class="pill">${p.funil}</span><span class="pill">${state[p.id]}</span>`; document.getElementById('drawerTitle').textContent=p.title; document.getElementById('drawerHook').textContent='Gancho/ideia: '+p.hook; document.getElementById('drawerContent').innerHTML=drawerHtml(p,i); document.getElementById('backdrop').classList.add('show'); document.getElementById('drawer').classList.add('open'); attachDynamic();}
+function drawerHtml(p,i){let cenas=p.cenas?`<div class="section"><h4>Roteiro por cena</h4>${p.cenas.map((c,idx)=>`<div class="scene"><div class="scene-num">${idx+1}</div><div><b>Visual</b>${c.visual}<div class="fala">Copy/fala: ${c.fala}</div><small><b>Direção:</b> ${c.dica}</small></div></div>`).join('')}</div>`:''; let feed=!p.cenas?`<div class="section"><h4>Ideia visual</h4><div class="box">${p.ideia||''}</div></div><div class="section"><h4>Copy do post</h4><div class="box">${p.copy||''}</div></div>`:''; return `<div class="section"><h4>Estratégia do conteúdo</h4><div class="box"><b>Objetivo:</b> ${p.obj}
+<b>Funil:</b> ${p.funil}
+<b>Prioridade:</b> ${p.prioridade}
+<b>Conecta com:</b> ${p.prox}
+<b>Responsável sugerido:</b> ${p.responsavel}</div><div class="copy-row"><button class="mini" data-copy="brief" data-index="${i}">Copiar briefing</button><button class="mini" data-copy="roteiro" data-index="${i}">Copiar roteiro/copy</button><button class="mini ok" data-copy="cliente" data-index="${i}">Copiar mensagem cliente</button></div></div>${cenas}${feed}<div class="section"><h4>Legenda sugerida</h4><div class="box">${p.legenda||'Sem legenda cadastrada neste post.'}</div></div>`}
+function closeDrawer(){document.getElementById('backdrop').classList.remove('show');document.getElementById('drawer').classList.remove('open');}
+function copyPost(i,type){const p=posts[i]; let text=''; if(type==='brief') text=`BRIEFING — ${p.dow} ${p.d}/${p.m}
+Post: ${p.title}
+Formato: ${p.tipo}
+Categoria: ${catLabel(p)}
+Objetivo: ${p.obj}
+Funil: ${p.funil}
+Gancho: ${p.hook}
+Conecta com: ${p.prox}
+Status: ${state[p.id]}`; if(type==='roteiro') text=p.cenas?`ROTEIRO — ${p.title}
+
+GANCHO DE ABERTURA: ${p.hook}
+
+${p.cenas.map((c,idx)=>`CENA ${idx+1}
+Visual: ${c.visual}
+Copy/Fala: ${c.fala}
+Direção: ${c.dica}`).join('\n\n')}
+
+LEGENDA:
+${p.legenda||''}`:`COPY — ${p.title}
+
+IDEIA VISUAL:
+${p.ideia||''}
+
+COPY DO POST:
+${p.copy||''}
+
+LEGENDA:
+${p.legenda||''}`; if(type==='cliente') text=`Olá, segue o conteúdo previsto para ${p.dow}, ${p.d}/${p.m}.
+
+Tema: ${p.title}
+Formato: ${p.tipo}
+Objetivo: ${p.obj}
+
+A ideia é trabalhar ${catLabel(p).toLowerCase()} de forma estratégica, conectando com o próximo conteúdo: ${p.prox}.
+
+Caso tenha algum ajuste, nos avise com antecedência para mantermos o fluxo de criação organizado.`; navigator.clipboard?.writeText(text).then(()=>toast('Copiado!')).catch(()=>fallbackCopy(text));}
+function fallbackCopy(text){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado!')} function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',1800)}
+function renderAllSoft(){renderDashboard();renderCalendar();renderKanban();renderClient();renderKpis();}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-action]'); if(!a)return; if(a.dataset.action==='close-drawer')closeDrawer(); if(a.dataset.action==='reset'){if(confirm('Limpar todos os status salvos?')){state={};posts.forEach(p=>state[p.id]='Ideia aprovada');saveState();renderAllSoft();}} if(a.dataset.action==='export'){copyText(JSON.stringify({status:state,metricas:metrics},null,2));} if(a.dataset.action==='copy-library'){copyText(document.getElementById('library').innerText);} }); function copyText(t){navigator.clipboard?.writeText(t).then(()=>toast('Dados copiados!')).catch(()=>fallbackCopy(t));}
+document.getElementById('backdrop').onclick=closeDrawer;
+tabsInit();initFilters();renderDashboard();renderCalendar();renderKanban();renderLibrary();renderClient();renderMetricas();
+</script>
+</body>
+</html>
